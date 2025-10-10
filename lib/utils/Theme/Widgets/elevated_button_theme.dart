@@ -5,6 +5,7 @@ class ElevatedButtonThemes{
 
    static final ElevatedButtonThemeData lightElevatedButtonTheme = ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
+      elevation: 0,
       backgroundColor: EColors.accentPrimary,
         minimumSize: Size(double.infinity,56),
         foregroundColor: EColors.light,

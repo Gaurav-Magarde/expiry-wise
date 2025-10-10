@@ -1,3 +1,4 @@
+import 'package:expiry_wise_app/features/Navigation/screens/NavigationScreen.dart';
 import 'package:expiry_wise_app/utils/Theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget{
       theme: EAppTheme.lightTheme,
       title: "expiry-wise",
       debugShowCheckedModeBanner: false,
-      home: const OnBoardingScreen(),
+      home: const NavigationScreen(),
     );
 
   }
