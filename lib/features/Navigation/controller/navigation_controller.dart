@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 import '../../All Items/screens/all_items_screen.dart';
@@ -14,6 +15,7 @@ class NavigationController extends GetxController{
   ];
 
   void changeScreen(int index){
+    if(kDebugMode) print(index);
     selectedScreenIndex.value = index;
   }
 }

@@ -10,25 +10,29 @@ class NavigationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(NavigationController());
     return Scaffold(
-      bottomNavigationBar: NavigationBar(
-        elevation: 0,
-        selectedIndex: controller.selectedScreenIndex.value,
-backgroundColor: Colors.grey[100],
-        height: 60,
-indicatorColor: Colors.grey[100],
-        onDestinationSelected: controller.changeScreen,
-        destinations: [
-          NavigationDestination(selectedIcon: Icon(Icons.home,color: EColors.primary,), icon:  Icon(Icons.home), label: "home",),
-          NavigationDestination(
-            icon: Obx(()=> Icon(Icons.shopping_bag_outlined,color: controller.selectedScreenIndex.value == 1? EColors.primary : null,)),
-            label: "",
+      bottomNavigationBar: Obx(
+        ()=> NavigationBar(
+          shadowColor: Colors.grey,
+          elevation: 15,
+          selectedIndex: controller.selectedScreenIndex.value,
+        backgroundColor: Colors.grey[100],
+          height: 60,
+        indicatorColor: Colors.grey[100],
+          onDestinationSelected: controller.changeScreen,
+          destinations: [
+            NavigationDestination(selectedIcon: Icon( Icons.home,color: EColors.primary,size: 28,), icon:  Icon(Icons.home,), label: "Home",),
+            NavigationDestination(
+              icon: Icon(Icons.shopping_bag_outlined,),
+              label: "All Items",selectedIcon: Icon(Icons.shopping_bag_outlined,color: EColors.primary,size: 28,),
 
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.list_rounded),
-            label: "Setting",
-          ),
-        ],
+            ),
+            NavigationDestination(
+              selectedIcon: Icon(Icons.settings,color: EColors.primary,size: 28,),
+              icon: Icon(Icons.settings),
+              label: "Setting",
+            ),
+          ],
+        ),
       ),
       body: Obx(() => controller.screens[controller.selectedScreenIndex.value]),
     );
