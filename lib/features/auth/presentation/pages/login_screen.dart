@@ -21,7 +21,7 @@ class LoginScreen extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-      SizedBox(height: 16,),
+          const SizedBox(height: 16,),
           Expanded(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 32),
@@ -51,10 +51,10 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
-                  SizedBox(height: 16),
-                  LoginButtons(),
+                  const SizedBox(height: 16),
+                  const LoginButtons(),
 
                   Expanded(
                     child: Column(
@@ -69,7 +69,7 @@ class LoginScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),

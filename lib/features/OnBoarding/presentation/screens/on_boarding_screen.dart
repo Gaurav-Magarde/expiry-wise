@@ -23,7 +23,7 @@ class OnBoardingScreen extends ConsumerWidget {
           SizedBox(
               height: MediaQuery.of(context).size.height*.9,
             child: PageView(
-              physics: BouncingScrollPhysics(),
+              physics:const  BouncingScrollPhysics(),
               padEnds: true,
               onPageChanged: (int index) {
                 notifier.pageChange(index);
@@ -64,7 +64,7 @@ class OnBoardingScreen extends ConsumerWidget {
                             : Colors.white,
                       ),
                     ),
-                    SizedBox(width: 16),
+                    const SizedBox(width: 16),
                     Container(
                       height: 15,
                       width: 15,
@@ -76,7 +76,7 @@ class OnBoardingScreen extends ConsumerWidget {
                             : Colors.white,
                       ),
                     ),
-                    SizedBox(width: 16),
+                    const SizedBox(width: 16),
 
                     Container(
                       height: 15,
@@ -102,7 +102,7 @@ class OnBoardingScreen extends ConsumerWidget {
                       }
                     }
                   },
-                  child: Text("Continue"),
+                  child:const  Text("Continue"),
                 ),
               );
             },

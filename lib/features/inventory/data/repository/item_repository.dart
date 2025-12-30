@@ -1,8 +1,6 @@
 import 'package:expiry_wise_app/services/api_services/food_api_service.dart';
 import 'package:expiry_wise_app/core/utils/loaders/image_api.dart';
 import 'package:expiry_wise_app/features/Space/presentation/controllers/current_space_provider.dart';
-import 'package:expiry_wise_app/features/Space/data/repository/space_repository.dart';
-import 'package:expiry_wise_app/features/User/data/models/user_model.dart';
 import 'package:expiry_wise_app/features/User/presentation/controllers/user_controller.dart';
 import 'package:expiry_wise_app/services/remote_db/fire_store_service.dart';
 import 'package:expiry_wise_app/core/utils/snackbars/snack_bar_service.dart';
@@ -17,7 +15,6 @@ import '../../../../core/utils/exception/firebase_auth_exceptions.dart';
 import '../../../../core/utils/exception/firebase_exceptions.dart';
 import '../../../../core/utils/exception/format_exceptions.dart';
 import '../../../../core/utils/exception/platform_exceptions.dart';
-import '../../../Space/data/model/space_model.dart';
 
 final itemRepoProvider = Provider((ref)
 

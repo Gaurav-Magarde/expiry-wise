@@ -32,7 +32,7 @@ class _JoinSpaceScreen extends ConsumerState<JoinSpaceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: Text("Join A New Space")),
+      appBar: AppBar(title: const Text("Join A New Space")),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 32),
@@ -45,7 +45,7 @@ class _JoinSpaceScreen extends ConsumerState<JoinSpaceScreen> {
                 width: MediaQuery.of(context).size.width * .7,
                 child: Image.asset("assets/images/img_3.png", fit: BoxFit.fill),
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               Text(
                 "Join Your Team's Space",
                 style: Theme.of(
@@ -53,13 +53,13 @@ class _JoinSpaceScreen extends ConsumerState<JoinSpaceScreen> {
                 ).textTheme.headlineMedium!.apply(fontWeightDelta: 2),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               Text(
                 "Enter the invite code shared by your admin to collaborate",
                 style: Theme.of(context).textTheme.titleMedium,
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
 
               TextFormFieldWidget(
                 controller: _editingController,
@@ -68,9 +68,9 @@ class _JoinSpaceScreen extends ConsumerState<JoinSpaceScreen> {
                 },
                 hint: "Enter code here",
                 labelText: "joining code",
-                prefixIcon: Icon(Icons.mail_outline),
+                prefixIcon: const Icon(Icons.mail_outline),
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () async {
                   final isJoining = ref.read(isSpaceJoining);
@@ -86,25 +86,26 @@ class _JoinSpaceScreen extends ConsumerState<JoinSpaceScreen> {
                     final isJoining = ref.watch(isSpaceJoining);
                     if (isJoining) {
                       return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Joining..."),
-                          SizedBox(width: 16),
-                          CircularProgressIndicator(),
+                          const Text("Joining..."),
+                          const SizedBox(width: 16),
+                          const CircularProgressIndicator(color: Colors.white,),
                         ],
                       );
                     } else {
-                      return Text("Join Space");
+                      return const Text("Join Space");
                     }
                   },
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
                 "Don't have the code?Ask your admin.",
                 style: Theme.of(context).textTheme.labelMedium,
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 25),
+              const SizedBox(height: 25),
             ],
           ),
         ),

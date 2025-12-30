@@ -68,6 +68,7 @@ class ImageHelper{
   static Widget giveProductImage({required String? imagePath,required String? imagePathNetwork,required String category}){
     if (imagePath != null && imagePath.isNotEmpty && File(imagePath).existsSync()) {
       return Image.file(
+        cacheWidth: 200,
         File(imagePath),
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {

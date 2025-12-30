@@ -86,10 +86,10 @@ class AlertDialogSpaceCard extends ConsumerWidget {
                         }
                       },
                       child: isLoading
-                          ? CircularProgressIndicator(
+                          ?const  CircularProgressIndicator(
                         color: Colors.white,
                       )
-                          : Text("Save"),
+                          :const  Text("Save"),
                     );
                   },
                 ),

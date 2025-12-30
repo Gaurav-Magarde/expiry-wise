@@ -43,7 +43,7 @@ class DetailCard extends ConsumerWidget {
           ref.read(selectedContainerProvider.notifier).state = currentContainer;
         },
         child: Container(
-          padding: EdgeInsets.all(4),
+          padding:const  EdgeInsets.all(4),
           decoration: BoxDecoration(
             border: Border.all(
               width: isSelected ? 0 : 0,
@@ -61,7 +61,7 @@ class DetailCard extends ConsumerWidget {
           ),
           child: Container(
             // width: 100,
-            padding: EdgeInsets.all(8),
+            padding: const EdgeInsets.all(8),
             height: isSelected ? 160 : 150,
             decoration: BoxDecoration(
               gradient: color,
@@ -73,7 +73,7 @@ class DetailCard extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(icon, color: Colors.white),
-                SizedBox(height: 8),
+                const  SizedBox(height: 8),
                 Text(
                   quantity.toString(),
                   style: Theme.of(context).textTheme.headlineMedium!.apply(
@@ -81,7 +81,7 @@ class DetailCard extends ConsumerWidget {
                     fontWeightDelta: 2,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   content,
                   style: Theme.of(

@@ -20,8 +20,8 @@ class SortableList extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
         children: [
-          AllChips(),
-          SizedBox(height: 16),
+          const AllChips(),
+          const SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Row(
@@ -71,7 +71,7 @@ class SortableList extends ConsumerWidget {
                                 return DropdownButton<OrderBy>(
                                   value: orderByValue,
                                   elevation: 0,
-                                  underline: SizedBox(),
+                                  underline:const  SizedBox(),
 
                                   items: [
                                     DropdownMenuItem<OrderBy>(
@@ -178,7 +178,7 @@ class SortableList extends ConsumerWidget {
               ],
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Expanded(
             child: Consumer(
               builder: (_, ref, __) {
@@ -189,21 +189,14 @@ class SortableList extends ConsumerWidget {
                     final isLoading = ref.watch(isItemsSortingProvider);
                     final list = List<ItemModel>.from(items);
                     if (isLoading) {
-                      return RefreshIndicator(
-                        onRefresh: () async {
-                          await Future.delayed(Duration(seconds: 2));
+                      return ListView.separated(
+                        itemBuilder: (context, index) {
+                          return const ItemCardShimmer();
                         },
-                        color: EColors.primary,
-
-                        child: ListView.separated(
-                          itemBuilder: (context, index) {
-                            return ItemCardShimmer();
-                          },
-                          separatorBuilder: (context, ind) {
-                            return SizedBox(height: 8);
-                          },
-                          itemCount: 7,
-                        ),
+                        separatorBuilder: (context, ind) {
+                          return const SizedBox(height: 8);
+                        },
+                        itemCount: 7,
                       );
                     }
                     return Consumer(
@@ -212,72 +205,75 @@ class SortableList extends ConsumerWidget {
 
                         final sortedList = list
                             .where(
-                              (item) => item.name.toLowerCase().startsWith(
+                              (item) => item.name.toLowerCase().contains(
                                 toSearch.toLowerCase(),
                               ),
                             )
                             .toList();
                         if (sortedList.isEmpty) {
-                          return SingleChildScrollView(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.1,
-                                ),
-                                Image.asset("assets/images/no_items_img.png"),
-                                SizedBox(height: 24),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0,
+                          return RefreshIndicator(
+                            onRefresh: () async {
+                              await Future.delayed(Duration(seconds: 2));
+                            },
+                            child: SingleChildScrollView(
+
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+
+                                  Image.asset("assets/images/no_items_img.png"),
+                                  const  SizedBox(height: 24),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0,
+                                    ),
+                                    child: Text(
+                                      "No Items Found",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall!
+                                          .apply(
+                                            color: EColors.primaryDark,
+                                            fontWeightDelta: 2,
+                                          ),
+                                      textAlign: TextAlign.center,
+                                    ),
                                   ),
-                                  child: Text(
-                                    "No Items Found",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall!
-                                        .apply(
-                                          color: EColors.primaryDark,
-                                          fontWeightDelta: 2,
-                                        ),
-                                    textAlign: TextAlign.center,
+                                  const  SizedBox(height: 16),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0,
+                                    ),
+                                    child: Text(
+                                      "Try adjusting your search or add a new item to your list",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium!
+                                          .apply(
+                                            color: EColors.accentPrimary,
+                                            fontWeightDelta: 2,
+                                          ),
+                                      textAlign: TextAlign.center,
+                                    ),
                                   ),
-                                ),
-                                SizedBox(height: 16),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0,
+                                  const  SizedBox(height: 24),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0,
+                                    ),
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        context.pushNamed(
+                                          MYRoute.addNewItemScreen,
+                                          queryParameters: {},
+                                        );
+                                      },
+                                      child:const  Text("Add Item"),
+                                    ),
                                   ),
-                                  child: Text(
-                                    "Try adjusting your search or add a new item to your list",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium!
-                                        .apply(
-                                          color: EColors.accentPrimary,
-                                          fontWeightDelta: 2,
-                                        ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                                SizedBox(height: 24),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0,
-                                  ),
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      context.pushNamed(
-                                        MYRoute.addNewItemScreen,
-                                        queryParameters: {},
-                                      );
-                                    },
-                                    child: Text("Add Item"),
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           );
                         }
@@ -305,10 +301,10 @@ class SortableList extends ConsumerWidget {
 
                     return ListView.separated(
                       itemBuilder: (context, index) {
-                        return ItemCardShimmer();
+                        return const ItemCardShimmer();
                       },
                       separatorBuilder: (context, ind) {
-                        return SizedBox(height: 8);
+                        return const  SizedBox(height: 8);
                       },
                       itemCount: 7,
                     );

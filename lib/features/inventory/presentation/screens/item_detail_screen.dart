@@ -1,5 +1,7 @@
 import 'package:expiry_wise_app/core/widgets/add_item_floating_button.dart';
+import 'package:expiry_wise_app/features/inventory/data/models/item_model.dart';
 import 'package:expiry_wise_app/features/inventory/presentation/controllers/item_controller.dart';
+import 'package:expiry_wise_app/features/inventory/presentation/widgets/item_detail_card.dart';
 import 'package:expiry_wise_app/routes/route.dart';
 import 'package:expiry_wise_app/core/theme/colors.dart';
 import 'package:expiry_wise_app/core/utils/helpers/item_date_helper.dart';
@@ -16,7 +18,7 @@ class ItemDetailScreen extends ConsumerWidget {
     final item = ref.watch(itemsStreamProvider);
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
-      appBar: AppBar(title: Text("Product Detail")),
+      appBar: AppBar(title: const Text("Product Detail")),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16),
         child: item.when(
@@ -53,10 +55,10 @@ class ItemDetailScreen extends ConsumerWidget {
                     ),
                   ),
 
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Container(
-                    padding: EdgeInsets.all(16),
-                    margin: EdgeInsets.symmetric(horizontal: 16),
+                    padding:const  EdgeInsets.all(16),
+                    margin:const  EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
                       color: ItemUtils.getBackgroundColor(item.expiryDate),
                       borderRadius: BorderRadius.circular(16),
@@ -67,7 +69,7 @@ class ItemDetailScreen extends ConsumerWidget {
                         Row(
                           children: [
                             ItemUtils.getExpiryIcon(item.expiryDate),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Text(
                               ItemUtils.getExpiryTime(item.expiryDate),
                               style: Theme.of(context).textTheme.titleMedium!
@@ -75,7 +77,7 @@ class ItemDetailScreen extends ConsumerWidget {
                             ),
                           ],
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Column(
                           children: [
                             Container(
@@ -98,7 +100,7 @@ class ItemDetailScreen extends ConsumerWidget {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
@@ -114,155 +116,13 @@ class ItemDetailScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  SizedBox(height: 16),
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 16),
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          offset: Offset(0, 3),
-                          blurStyle: BlurStyle.outer,
-                          blurRadius: 15,
-                          color: Colors.grey.shade200,
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Icon(
-                                  Icons.shopping_bag_sharp,
-                                  color: EColors.accentPrimary,
-                                ),
-                                SizedBox(width: 16),
-                                Text(
-                                  "Product name ",
-                                  style: Theme.of(context).textTheme.titleSmall!
-                                      .apply(color: EColors.textSecondary),
-                                ),
-                                SizedBox(width: 16),
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          textAlign: TextAlign.end,
-                                          item.name,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleMedium!
-                                              .apply(
-                                                color: EColors.textPrimary,
-                                              ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 8),
-                            SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Icons.date_range,
-                                  color: EColors.accentPrimary,
-                                ),
-                                SizedBox(width: 16),
-                                Text(
-                                  "Added Date  ",
-                                  style: Theme.of(context).textTheme.titleSmall!
-                                      .apply(color: EColors.textSecondary),
-                                ),
-                                Spacer(),
-                                Text(
-                                  item.addedDate!,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium!
-                                      .apply(color: EColors.textPrimary),
-                                ),
-                              ],
-                            ),
-
-                            SizedBox(height: 8),
-                            SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Icons.menu_outlined,
-                                  color: EColors.accentPrimary,
-                                ),
-                                SizedBox(width: 16),
-                                Text(
-                                  "Quantity ",
-                                  style: Theme.of(context).textTheme.titleSmall!
-                                      .apply(color: EColors.textSecondary),
-                                ),
-                                SizedBox(height: 16),
-
-                                Spacer(),
-                                Text(
-                                  "${item.quantity.toString()} ${item.unit}",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium!
-                                      .apply(color: EColors.textPrimary),
-                                  overflow: TextOverflow.clip,
-                                ),
-                              ],
-                            ),
-
-                            SizedBox(height: 8),
-                            SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Icons.category_sharp,
-                                  color: EColors.accentPrimary,
-                                ),
-                                SizedBox(width: 16),
-                                Text(
-                                  "Category ",
-                                  style: Theme.of(context).textTheme.titleSmall!
-                                      .apply(color: EColors.textSecondary),
-                                ),
-                                Spacer(),
-                                Text(
-                                  item.category,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium!
-                                      .apply(color: EColors.textPrimary),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
+                  ItemDetailCard(item: item),
+                  const SizedBox(height: 16),
                   Container(
                     width: double.infinity,
-                    padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                    margin: EdgeInsets.symmetric(horizontal: 16),
+                    padding:const  EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    margin:const  EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
                       color: const Color(
                         0xFFFFFDE7,
@@ -280,7 +140,7 @@ class ItemDetailScreen extends ConsumerWidget {
                               Icons.sticky_note_2,
                               color: Colors.orange.shade300,
                             ),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Text(
                               "Note",
                               style: Theme.of(context).textTheme.titleMedium!
@@ -288,7 +148,7 @@ class ItemDetailScreen extends ConsumerWidget {
                             ),
                           ],
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Padding(
                           padding: const EdgeInsets.only(
                             top: 8.0,
@@ -304,13 +164,13 @@ class ItemDetailScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  SizedBox(height: 50),
+                  const SizedBox(height: 50),
                 ],
               ),
             );
           },
-          error: (e, s) => Text("error"),
-          loading: () => CircularProgressIndicator(),
+          error: (e, s) =>const  Text("error"),
+          loading: () =>const  CircularProgressIndicator(),
         ),
       ),
       floatingActionButton: AddItemFloatingButton(() {
@@ -322,4 +182,5 @@ class ItemDetailScreen extends ConsumerWidget {
     );
   }
 }
+
 

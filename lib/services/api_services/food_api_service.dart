@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:expiry_wise_app/core/constants/ApiKeys.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
@@ -7,7 +8,7 @@ final foodApiProvider = Provider<FoodApiService>((ref)=>FoodApiService());
 class FoodApiService{
 
   static get instance => FoodApiService();
-  static const  String _baseUrl = 'https://world.openfoodfacts.org/api/v0/product';
+  static const  String _baseUrl = ApiKeys.imageUrl;
 
   Future<Map<String,dynamic>?> getProductByBarcode(String barcode)async{
 

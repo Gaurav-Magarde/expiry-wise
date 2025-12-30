@@ -1,10 +1,8 @@
 import 'package:expiry_wise_app/features/inventory/data/models/api_product_model.dart';
 import 'package:expiry_wise_app/services/api_services/food_api_service.dart';
 import 'package:expiry_wise_app/features/Space/presentation/controllers/current_space_provider.dart';
-import 'package:expiry_wise_app/features/Space/data/repository/space_repository.dart';
 import 'package:expiry_wise_app/features/User/presentation/controllers/user_controller.dart';
 import 'package:expiry_wise_app/services/local_db/sqflite_setup.dart';
-import 'package:expiry_wise_app/services/notification_services/local_notification_service.dart';
 import 'package:expiry_wise_app/services/remote_db/fire_store_service.dart';
 import 'package:expiry_wise_app/core/utils/snackbars/snack_bar_service.dart';
 import 'package:expiry_wise_app/core/utils/exception/exceptions.dart';

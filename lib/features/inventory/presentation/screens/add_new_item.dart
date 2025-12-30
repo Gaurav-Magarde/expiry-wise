@@ -23,7 +23,7 @@ class AddNewItem extends ConsumerWidget {
             onPressed: () {
               context.pushNamed(MYRoute.barcodeScanScreen);
             },
-            icon: Icon(Icons.document_scanner),
+            icon:const Icon(Icons.document_scanner),
           ),
         ],
         title: Text(id == null ? "Add Item" : "Edit item"),

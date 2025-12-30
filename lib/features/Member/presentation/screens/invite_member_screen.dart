@@ -24,18 +24,19 @@ class InviteMemberScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 50),
+              const  SizedBox(height: 50),
 
               Container(
+                height: height*.4,
                 decoration: BoxDecoration(color: Colors.transparent),
                 child: Image.asset(
                   "assets/images/invite_member.png",
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               SizedBox(
-                width: MediaQuery.of(context).size.width * .7,
+                width: width * .7,
                 child: Text(
                   textAlign: TextAlign.center,
                   "Share this code with people want to invite",
@@ -56,7 +57,7 @@ class InviteMemberScreen extends ConsumerWidget {
                             Container(
                               height: 70,
                               width: double.infinity,
-                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 border: Border.all(color: Colors.grey, width: 1),
@@ -89,7 +90,7 @@ class InviteMemberScreen extends ConsumerWidget {
                                 ],
                               ),
                             ),
-                            SizedBox(height: 16),
+                            const SizedBox(height: 16),
                             TextButton(
                               onPressed: () async {
                                 if (id != null) {
@@ -109,7 +110,7 @@ class InviteMemberScreen extends ConsumerWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(Icons.copy, color: EColors.accentPrimary),
-                                  SizedBox(width: 8),
+                                  const  SizedBox(width: 8),
                                   Text(
                                     "Copy code",
                                     style: Theme.of(context).textTheme.titleSmall!
@@ -118,7 +119,7 @@ class InviteMemberScreen extends ConsumerWidget {
                                 ],
                               ),
                             ),
-                            SizedBox(height: 16),
+                            const SizedBox(height: 16),
                           ],
                         ),
                       );
@@ -127,7 +128,7 @@ class InviteMemberScreen extends ConsumerWidget {
                       "No Space found",
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    loading: () => CircularProgressIndicator(),
+                    loading: () => const CircularProgressIndicator(),
                   );
                 },
               ),
@@ -143,7 +144,7 @@ class InviteMemberScreen extends ConsumerWidget {
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [Text("Join new Space")],
+                    children: [const Text("Join new Space")],
                   ),
                 ),
               ),

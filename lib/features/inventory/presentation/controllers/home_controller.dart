@@ -39,7 +39,7 @@ final expiredItemsProvider = Provider<AsyncValue<List<ItemModel>>>((ref)  {
         expired.sort((a,b){
           final dateA = DateTime.parse(a.expiryDate);
           final dateB = DateTime.parse(b.expiryDate);
-           Future.delayed(Duration(seconds: 3));
+           Future.delayed(Duration(seconds: 1));
           return dateA.compareTo(dateB);
         });
 

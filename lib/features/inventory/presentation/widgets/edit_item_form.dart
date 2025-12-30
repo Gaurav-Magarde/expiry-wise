@@ -33,10 +33,10 @@ class EditItemForm extends ConsumerWidget {
     });
     return SingleChildScrollView(
       child: Padding(
-        padding: EdgeInsets.all(0),
+        padding:const  EdgeInsets.all(0),
         child: Column(
           children: [
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             InkWell(
               onTap: () async {
@@ -72,8 +72,8 @@ class EditItemForm extends ConsumerWidget {
             ),
 
             Container(
-              padding: EdgeInsets.all(16),
-              margin: EdgeInsets.all(16),
+              padding:const  EdgeInsets.all(16),
+              margin: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -103,7 +103,7 @@ class EditItemForm extends ConsumerWidget {
                               hint: "Item Name",
                               labelText: 'Product Name',
                             ),
-                            SizedBox(height: 16),
+                            const SizedBox(height: 16),
 
                             Row(
                               children: [
@@ -181,7 +181,7 @@ class EditItemForm extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   Consumer(
                     builder: (context, ref, child) {
@@ -244,8 +244,8 @@ class EditItemForm extends ConsumerWidget {
             ),
 
             Container(
-              padding: EdgeInsets.all(16),
-              margin: EdgeInsets.only(bottom:  16,right: 16,left: 16),
+              padding:const  EdgeInsets.all(16),
+              margin:const  EdgeInsets.only(bottom:  16,right: 16,left: 16),
               decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
@@ -304,7 +304,7 @@ class EditItemForm extends ConsumerWidget {
                       );
                     },
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   TextFormFieldWidget(
                     controller: state.noteController,
                     hint: "Add a Note",

@@ -42,7 +42,7 @@ class _AllSpacesScreens extends ConsumerState<AllSpacesScreens> {
           //   child: TextButton(onPressed: (){}, child: Text("Add",style: Theme.of(context).textTheme.titleLarge,)),
           // )
         ],
-        title: Text("Spaces"),
+        title:const  Text("Spaces"),
       ),
       body: Padding(
         padding: const EdgeInsets.all( 8.0),
@@ -59,12 +59,12 @@ class _AllSpacesScreens extends ConsumerState<AllSpacesScreens> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset('assets/images/img_5.png'),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Text(
                           "No space Found!",style: Theme.of(context).textTheme.titleLarge!.apply(color: EColors.primaryDark,fontWeightDelta: 3),
                           textAlign: TextAlign.center,
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
                           "Create a new space to start organising your items",style: Theme.of(context).textTheme.titleSmall!.apply(color: EColors.primaryDark,fontWeightDelta: 2),
                           textAlign: TextAlign.center,
@@ -77,7 +77,7 @@ class _AllSpacesScreens extends ConsumerState<AllSpacesScreens> {
                 return ListView.separated(
                   itemCount: list.length,
                   separatorBuilder: (_, __) {
-                    return SizedBox(height: 16);
+                    return const SizedBox(height: 16);
                   },
                   itemBuilder: (context, index) {
                     final space = list[index];
@@ -85,9 +85,9 @@ class _AllSpacesScreens extends ConsumerState<AllSpacesScreens> {
                   },
                 );
               },
-              error: (e, s) => Text("error"),
+              error: (e, s) => const Text("error"),
               loading: () {
-                return SpaceCardShimmer();
+                return const SpaceCardShimmer();
               },
             );
           },
@@ -95,7 +95,7 @@ class _AllSpacesScreens extends ConsumerState<AllSpacesScreens> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: EColors.primary,
-        child: Icon(Icons.add, color: Colors.white),
+        child: const Icon(Icons.add, color: Colors.white),
         onPressed: () {
 
           showDialog(
@@ -110,7 +110,7 @@ class _AllSpacesScreens extends ConsumerState<AllSpacesScreens> {
                   onChanged: (v) {
                     ref.read(spaceNameProvider.notifier).state = v;
                   },
-                  prefixIcon: Icon(Icons.store_mall_directory_sharp),
+                  prefixIcon: const Icon(Icons.store_mall_directory_sharp),
                   hint: "eg. Home Space",
                 ),
                 actions: [
@@ -159,7 +159,7 @@ class _AllSpacesScreens extends ConsumerState<AllSpacesScreens> {
                                     ? CircularProgressIndicator(
                                         color: Colors.white,
                                       )
-                                    : Text("create"),
+                                    :const  Text("create"),
                               );
                             },
                           ),

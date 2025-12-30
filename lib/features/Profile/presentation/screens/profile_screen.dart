@@ -32,14 +32,14 @@ class ProfileScreen extends ConsumerWidget {
         child: Column(
           children: [
             Container(
-              margin: EdgeInsets.only(top: 50,bottom: 16),
+              margin:const  EdgeInsets.only(top: 50,bottom: 16),
               decoration: BoxDecoration(color: Colors.grey.shade200,),
               child: Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(width: 30,),
+                    const  SizedBox(width: 30,),
                     Container(
                       clipBehavior: Clip.hardEdge,
                       decoration: BoxDecoration(
@@ -73,7 +73,7 @@ class ProfileScreen extends ConsumerWidget {
                         },
                       ),
                     ),
-                    SizedBox(width: 24,),
+                    const SizedBox(width: 24,),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -94,16 +94,19 @@ class ProfileScreen extends ConsumerWidget {
                                   name,
                                   style: Theme.of(context).textTheme.titleLarge!
                                       .apply(fontWeightDelta: 3),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                SizedBox(height: 4),
+                                const  SizedBox(height: 4),
                                 Text(
                                   mail,
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleSmall!
                                       .apply(color: Colors.purple),
+                                  overflow: TextOverflow.ellipsis,
+
                                 ),
-                                SizedBox(height: 8,)
+                                const SizedBox(height: 8,)
                               ],
                             );
                           },
@@ -115,29 +118,29 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
             Divider(height: 1,thickness: .5,color: Colors.grey.shade500,),
-            SizedBox(height: 16,)
+            const SizedBox(height: 16,)
 ,
             Padding(
               padding: const EdgeInsets.symmetric(),
               child: Column(
                 children: [
 
-                  HeadingSection(heading: "Account Details", buttonName: ''),
-                  SizedBox(height: 8),
+                  const HeadingSection(heading: "Account Details", buttonName: ''),
+                  const SizedBox(height: 8),
 
-                  ProfileSection(),
-                  SizedBox(height: 8),
+                  const ProfileSection(),
+                  const SizedBox(height: 8),
 
                   Consumer(
                     builder: (context, ref, child) {
-                      return HeadingSection(heading: "WORKSPACE", buttonName: '');
+                      return const  HeadingSection(heading: "WORKSPACE", buttonName: '');
                     },
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
                   Container(
-                    margin: EdgeInsets.symmetric(horizontal: 0),
-                    padding: EdgeInsets.symmetric(vertical: 8,horizontal: 12),
+                    margin:const  EdgeInsets.symmetric(horizontal: 0),
+                    padding:const  EdgeInsets.symmetric(vertical: 8,horizontal: 12),
                     decoration: BoxDecoration(
                         color: Colors.white,
                         boxShadow: [
@@ -148,7 +151,7 @@ class ProfileScreen extends ConsumerWidget {
                             color: Colors.grey.shade200,
                           ),
                         ],
-                        border: Border(),
+                        border:const  Border(),
                         borderRadius: BorderRadius.circular(8),),
                     child: Column(children: [
                       Consumer(
@@ -230,18 +233,18 @@ class ProfileScreen extends ConsumerWidget {
 
                     ],),
                   ),
-                  SizedBox(height: 8),
+                  const  SizedBox(height: 8),
 
                   Consumer(
                     builder: (context, ref, child) {
-                      return HeadingSection(heading: "PREFERENCES", buttonName: '');
+                      return const HeadingSection(heading: "PREFERENCES", buttonName: '');
                     },
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
                   Container(
-                    margin: EdgeInsets.symmetric(horizontal: 0),
-                    padding: EdgeInsets.symmetric(vertical: 8,horizontal: 12),
+                    margin:const  EdgeInsets.symmetric(horizontal: 0),
+                    padding:const  EdgeInsets.symmetric(vertical: 8,horizontal: 12),
                     decoration: BoxDecoration(
                         color: Colors.white,
                         boxShadow: [
@@ -252,7 +255,7 @@ class ProfileScreen extends ConsumerWidget {
                             color: Colors.grey.shade200,
                           ),
                         ],
-                        border: Border(),
+                        border:const  Border(),
                         borderRadius: BorderRadius.circular(8),),
                     child: Column(children: [
 
@@ -393,7 +396,7 @@ class ProfileScreen extends ConsumerWidget {
                     ],),
                   ),
 
-                      SizedBox(height: 32),
+                  const  SizedBox(height: 32),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16.0,
@@ -404,7 +407,8 @@ class ProfileScreen extends ConsumerWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.exit_to_app_sharp,color: Colors.white,size: 20,),SizedBox(width: 8,),
+                              const Icon(Icons.exit_to_app_sharp,color: Colors.white,size: 20,),
+                              const SizedBox(width: 8,),
                               Text(loginText),
                             ],
                           ),
@@ -419,7 +423,7 @@ class ProfileScreen extends ConsumerWidget {
                 onPressed: () {
                   showDialog(
                     context: context,
-                    builder: (_) => AlertBoxDeleteUser(),
+                    builder: (_) =>const  AlertBoxDeleteUser(),
                   );
                 },
                 child: Text(

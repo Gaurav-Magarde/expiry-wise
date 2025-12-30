@@ -13,20 +13,14 @@ class AllItemsScreen extends ConsumerStatefulWidget{
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return _AllItemsScreen();
+    return  _AllItemsScreen();
   }
 }
 
-class _AllItemsScreenState extends State<AllItemsScreen> {
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
-  }
-}
 
 
 class _AllItemsScreen extends ConsumerState<AllItemsScreen> {
-
+   _AllItemsScreen();
   @override
   Widget build(BuildContext context) {
     final isSearching = ref.watch(isSearchingProvider);
@@ -91,7 +85,7 @@ class _AllItemsScreen extends ConsumerState<AllItemsScreen> {
           ),
         ],
       ),
-      body: SortableList(),
+      body:const  SortableList(),
     );
   }
 }

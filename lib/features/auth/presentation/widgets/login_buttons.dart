@@ -15,7 +15,7 @@ class LoginButtons extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context,WidgetRef ref) {
-    final controller = ref.read(loginStateProvider.notifier);
+    final controller = ref.watch(loginStateProvider.notifier);
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -53,19 +53,19 @@ class LoginButtons extends ConsumerWidget {
             ],
           ),
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
 
-        Row(
+        const  Row(
           children: [
             Expanded(child: Divider()),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal:  8.0),
+              padding: EdgeInsets.symmetric(horizontal:  8.0),
               child: Text("OR"),
             ),
             Expanded(child: Divider())
           ],
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: EColors.primary),
           onPressed: () async {
@@ -96,7 +96,7 @@ class LoginButtons extends ConsumerWidget {
             ],
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
       ],
     );
   }

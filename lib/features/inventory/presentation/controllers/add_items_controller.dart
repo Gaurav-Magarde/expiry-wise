@@ -104,7 +104,7 @@ class AddItemController extends Notifier<AddItemState> {
       SnackBarService.showSuccess('Product added successfully');
       return item;
     } on TimeoutException catch(e){
-      SnackBarService.showError('Product added failed. $e');
+      SnackBarService.showError('Product added failed. ${e.message}');
 
     }
     catch (e) {
@@ -180,7 +180,7 @@ class AddItemController extends Notifier<AddItemState> {
       SnackBarService.showSuccess('Product updated successfully');
       return item;
     } on TimeoutException catch(e){
-      SnackBarService.showError('Product added failed. $e');
+      SnackBarService.showError('Product added failed. ${e.message}');
 
     } catch (e) {
       SnackBarService.showError('Product updated failed. $e');

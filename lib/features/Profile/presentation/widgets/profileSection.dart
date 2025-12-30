@@ -17,7 +17,7 @@ class ProfileSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     return Container(margin: EdgeInsets.symmetric(horizontal: 0),
-      padding: EdgeInsets.symmetric(vertical: 8,horizontal: 12),
+      padding: const EdgeInsets.symmetric(vertical: 8,horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -28,7 +28,7 @@ class ProfileSection extends ConsumerWidget {
             color: Colors.grey.shade200,
           ),
         ],
-        border: Border(),
+        border:const  Border(),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(

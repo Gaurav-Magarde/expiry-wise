@@ -33,7 +33,6 @@ class MyApp extends ConsumerWidget {
     // Notification initialization
     final notification = ref.watch(notificationServiceProvider);
     final c = ref.watch(isInternetConnectedProvider);
-    print(c);
     notification.init();
     notification.checkPendingNotifications();
 

@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../../../core/theme/colors.dart';
+
 class BarcodeScanScreen extends ConsumerStatefulWidget {
   const BarcodeScanScreen({super.key});
 
@@ -59,19 +61,19 @@ class _BarcodeScanScreen extends ConsumerState<BarcodeScanScreen> {
             },
           ),
           Positioned(
-            top: 50,
-            left: 30,
+            top: 60,
+            left: 25,
             child: IconButton(
               onPressed: () {
                 if(context.mounted) context.pop();
               },
-              icon: Icon(Icons.arrow_back_sharp),
+              icon: Icon(Icons.arrow_back_sharp,color: EColors.light,),
             ),
           ),
           Center(
             child: Container(
-              height: 250,
-              width: 350,
+              height: MediaQuery.of(context).size.height*.15,
+              width: MediaQuery.of(context).size.width*.7,
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.green, width: 3),
                 borderRadius: BorderRadius.circular(8),

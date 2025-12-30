@@ -33,15 +33,15 @@ class HomeCards extends StatelessWidget {
             Center(
               child: ListView.separated(
                 separatorBuilder: (context, index) {
-                  return SizedBox(height: 8,);
+                  return const SizedBox(height: 8,);
                   // Text("Nothing");
                 },
                 itemCount: isShimmer? 6 : list.length,
                 scrollDirection: Axis.vertical,
-                physics: NeverScrollableScrollPhysics(),
+                physics:const  AlwaysScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
-                   if(isShimmer ) return ItemCardShimmer();
+                   if(isShimmer ) return const ItemCardShimmer();
                   final item = list[index];
                   return ItemCard(
                     isExpired: false,

@@ -14,7 +14,7 @@ class MemberScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: Text("Members")),
+      appBar: AppBar(title:const  Text("Members")),
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8),
         child: Consumer(
@@ -41,7 +41,7 @@ class MemberScreen extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset('assets/images/img_6.png'),
-                        SizedBox(height: 16),
+                        const  SizedBox(height: 16),
                         Text(
                           "No Members added yet!",
                           style: Theme.of(context).textTheme.titleLarge!.apply(
@@ -50,7 +50,7 @@ class MemberScreen extends ConsumerWidget {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        SizedBox(height: 8),
+                        const  SizedBox(height: 8),
                         Text(
                           "Start invite members and collaborating.",
                           style: Theme.of(context).textTheme.titleSmall!.apply(
@@ -75,17 +75,13 @@ class MemberScreen extends ConsumerWidget {
                   },
                 );
               },
-              error: (e, s) => Text("Error"),
-              loading: () => MembersCardShimmer(),
+              error: (e, s) =>const  Text("Error"),
+              loading: () =>const  MembersCardShimmer(),
             );
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: EColors.primary,
-        child: Icon(Icons.person_add_rounded, color: Colors.white),
-        onPressed: () {},
-      ),
+
     );
   }
 }

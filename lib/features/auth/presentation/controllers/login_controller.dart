@@ -15,7 +15,7 @@ import 'package:uuid/uuid.dart';
 import '../../../../services/Connectivity/internet_connectivity.dart';
 import '../../data/repository/authentication_repository.dart';
 
-final loginStateProvider = StateNotifierProvider<LoginStateController, bool>(
+final loginStateProvider = StateNotifierProvider.autoDispose<LoginStateController, bool>(
   (ref) => LoginStateController(ref, false),
 );
 

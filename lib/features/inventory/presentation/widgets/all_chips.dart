@@ -21,10 +21,10 @@ class AllChips extends ConsumerWidget {
                   final selected = ref.watch(selectedChipProvider);
 
                   return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    padding:const EdgeInsets.symmetric(horizontal: 8),
                     child: ChoiceChip(label: Text(chip.toUpperCase(),style: Theme.of(context).textTheme.titleMedium!.apply(color: selected==chip ? Colors.white:EColors.textSecondary),), selected: selected==chip,onSelected: (currSelected){
                      if(currSelected) ref.read(selectedChipProvider .notifier).state = chip;
-                    },selectedColor: EColors.primary,backgroundColor: Colors.white,shape: StadiumBorder(),showCheckmark: false, ),
+                    },selectedColor: EColors.primary,backgroundColor: Colors.white,shape:const StadiumBorder(),showCheckmark: false, ),
                   );
                 },
               ),

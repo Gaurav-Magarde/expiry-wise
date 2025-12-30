@@ -205,7 +205,7 @@ class ItemCard extends ConsumerWidget {
 
                     ],
                   ),
-                      SizedBox(height: 8,),
+                  const  SizedBox(height: 8,),
                    if(item.note.isNotEmpty )Text(
                    '${item.note} ',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(

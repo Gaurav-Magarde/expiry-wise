@@ -127,7 +127,7 @@ class MemberCard extends ConsumerWidget {
                 child: Row(
                   children: [
                     Icon(Icons.logout, color: Colors.red, size: 20),
-                    SizedBox(width: 12),
+                    const  SizedBox(width: 12),
                     Text(
                       member.userId == userId ? "Exit Space" : "Remove User",
                       style: Theme.of(
@@ -150,7 +150,7 @@ class MemberCard extends ConsumerWidget {
                       color: Colors.black87,
                       size: 20,
                     ),
-                    SizedBox(width: 12),
+                    const  SizedBox(width: 12),
                     Text(
                       "Make $changeRoleTO",
                       style: Theme.of(context).textTheme.bodyMedium,
