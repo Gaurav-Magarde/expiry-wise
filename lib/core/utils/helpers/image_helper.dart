@@ -97,7 +97,7 @@ class ImageHelper{
   }
 
   static Icon giveCategoryIcon(String category) {
-    // Icon ka size fix kar diya taaki sab barabar dikhe
+
     const double kIconSize = 24.0;
 
     switch (category.toLowerCase().trim()) {
