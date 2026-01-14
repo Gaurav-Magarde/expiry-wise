@@ -40,4 +40,4 @@ class MemberModel {
   }
 }
 
-enum MemberRole { admin, member }
+enum MemberRole {admin,member }

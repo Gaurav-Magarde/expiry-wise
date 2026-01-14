@@ -11,7 +11,7 @@ class SpaceCardShimmer extends ConsumerWidget {
 
       child: Container(
         height: 150,
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         decoration: BoxDecoration(
           color: Colors.grey[200],
           border: Border.all(width: 3, color: Colors.grey[100]!),
@@ -56,13 +56,13 @@ class SpaceCardShimmer extends ConsumerWidget {
               ],
             ),
 
-            SizedBox(height: 32),
+            const SizedBox(height: 32),
 
             Row(
               children: [
                 Expanded(
                   child: Container(
-                    decoration: BoxDecoration(),
+                    decoration: const BoxDecoration(),
                     child: Column(
                       children: [
                         Shimmer(
@@ -76,7 +76,7 @@ class SpaceCardShimmer extends ConsumerWidget {
                             ),
                           ),
                         ),
-                        SizedBox(height: 8,),
+                        const SizedBox(height: 8,),
                         Shimmer(
                           child: Container(
                             width: 72,
@@ -89,14 +89,14 @@ class SpaceCardShimmer extends ConsumerWidget {
                           ),
                         ),
 
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                       ],
                     ),
                   ),
                 ),
                 Expanded(
                   child: Container(
-                    decoration: BoxDecoration(),
+                    decoration: const BoxDecoration(),
                     child: Column(
                       children: [
                         Shimmer(
@@ -110,7 +110,7 @@ class SpaceCardShimmer extends ConsumerWidget {
                             ),
                           ),
                         ),
-                        SizedBox(height: 8,),
+                        const SizedBox(height: 8,),
                         Shimmer(
                           child: Container(
                             width: 64,
@@ -123,7 +123,7 @@ class SpaceCardShimmer extends ConsumerWidget {
                           ),
                         ),
 
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                       ],
                     ),
                   ),

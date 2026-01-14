@@ -42,9 +42,9 @@ class SettingTile extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                            Text(title,style: Theme.of(context).textTheme.titleSmall!.apply(fontSizeDelta: 2),),
+                            Text(title,style: Theme.of(context).textTheme.labelMedium!.apply(),),
                           const SizedBox(),
-                          Text(subTitle,style: Theme.of(context).textTheme.bodyMedium!.apply(),overflow: TextOverflow.ellipsis,),
+                          Text(subTitle,style: Theme.of(context).textTheme.labelLarge!.apply(),overflow: TextOverflow.ellipsis,),
 
                         ],
                       ),

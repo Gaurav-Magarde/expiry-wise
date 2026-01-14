@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:icons_plus/icons_plus.dart';
 class ImageHelper{
   
   static Widget giveImage({required String? imagePath,required String? imagePathNetwork,}){
@@ -11,7 +10,7 @@ class ImageHelper{
         File(imagePath),
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
-          return Image.asset('assets/images/img_1.png', fit: BoxFit.cover,);
+          return Image.asset('assets/images/img_1.webp', fit: BoxFit.cover,);
         },
       );
     }
@@ -28,10 +27,10 @@ class ImageHelper{
             )
         ),
 
-        errorWidget: (context, url, error) => Image.asset('assets/images/img_1.png', fit: BoxFit.cover,),
+        errorWidget: (context, url, error) => Image.asset('assets/images/img_1.webp', fit: BoxFit.cover,),
       );
     }
-    return Image.asset('assets/images/img_1.png', fit: BoxFit.cover,);
+    return Image.asset('assets/images/img_1.webp', fit: BoxFit.cover,);
   }
 
 
@@ -41,7 +40,7 @@ class ImageHelper{
         File(imagePath),
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
-          return Image.asset('assets/images/tap_to_add_img.png', fit: BoxFit.cover,);
+          return Image.asset('assets/images/tap_to_add_img.webp', fit: BoxFit.cover,);
         },
       );
     }
@@ -58,11 +57,11 @@ class ImageHelper{
             )
         ),
 
-        errorWidget: (context, url, error) => Image.asset('assets/images/tap_to_add_img.png', fit: BoxFit.cover,),
+        errorWidget: (context, url, error) => Image.asset('assets/images/tap_to_add_img.webp', fit: BoxFit.cover,),
       );
     }
 
-    return Image.asset('assets/images/tap_to_add_img.png', fit: BoxFit.cover,);
+    return Image.asset('assets/images/tap_to_add_img.webp', fit: BoxFit.cover,);
   }
 
   static Widget giveProductImage({required String? imagePath,required String? imagePathNetwork,required String category}){
@@ -96,40 +95,49 @@ class ImageHelper{
     return giveCategoryIcon(category);
   }
 
-  static Icon giveCategoryIcon(String category) {
 
+  static Icon giveCategoryIcon(String category) {
     const double kIconSize = 24.0;
 
     switch (category.toLowerCase().trim()) {
 
       case 'grocery':
-        return const Icon(FontAwesome.basket_shopping_solid, color: Colors.orange, size: kIconSize);
+      // Shopping Cart ya Basket best hai
+        return const Icon(Icons.shopping_cart_rounded, color: Colors.orange, size: kIconSize);
 
       case 'vegetables':
-        return const Icon(FontAwesome.carrot_solid, color: Colors.green, size: kIconSize); // Leaf ya Carrot best hai
+      // Material me 'Carrot' nahi hai, isliye 'Eco' (Leaf) ya 'Nutrition' use karna padega
+        return const Icon(Icons.eco_rounded, color: Colors.green, size: kIconSize);
 
       case 'dairy':
-        return const Icon(FontAwesome.cheese_solid, color: Colors.blue, size: kIconSize); // Cheese/Milk representation
+      // 'Cheese' nahi hai, isliye 'Egg' ya 'Drink' (Milk) close option hai
+        return const Icon(Icons.egg_alt_rounded, color: Colors.blue, size: kIconSize);
+    // Note: Agar egg_alt error de, to Icons.local_drink_rounded use karna
 
       case 'medicine':
-        return const Icon(FontAwesome.pills_solid, color: Colors.redAccent, size: kIconSize); // Pills best hai
+      // Ye perfect hai
+        return const Icon(Icons.medication_rounded, color: Colors.redAccent, size: kIconSize);
 
       case 'personalcare':
       case 'personal care':
-        return const Icon(FontAwesome.pump_soap_solid, color: Colors.purple, size: kIconSize); // Soap/Lotion
+      // 'Spa' (Leaf/Flower) ya 'Clean Hands' sabse sahi hai
+        return const Icon(Icons.spa_rounded, color: Colors.purple, size: kIconSize);
 
       case 'electronics':
-        return const Icon(FontAwesome.plug_solid, color: Colors.indigo, size: kIconSize);
+      // Devices best hai
+        return const Icon(Icons.devices_other_rounded, color: Colors.indigo, size: kIconSize);
 
       case 'documents':
-        return const Icon(FontAwesome.file_contract_solid, color: Colors.brown, size: kIconSize);
+      // Description ya Folder
+        return const Icon(Icons.description_rounded, color: Colors.brown, size: kIconSize);
 
       case 'subscriptions':
-        return const Icon(FontAwesome.credit_card_solid, color: Colors.teal, size: kIconSize);
+      // Card Membership
+        return const Icon(Icons.card_membership_rounded, color: Colors.teal, size: kIconSize);
 
       case 'others':
       default:
-        return const Icon(FontAwesome.box_open_solid, color: Colors.grey, size: kIconSize);
+        return const Icon(Icons.category_rounded, color: Colors.grey, size: kIconSize);
     }
   }
 }

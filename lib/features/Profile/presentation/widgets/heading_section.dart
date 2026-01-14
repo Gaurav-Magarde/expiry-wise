@@ -16,10 +16,10 @@ class HeadingSection extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(heading,style:  TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Colors.grey[700]!,)),
-          Text(buttonName,style: Theme.of(context).textTheme.titleMedium,),
+          Text(buttonName,style: Theme.of(context).textTheme.titleSmall,),
 
         ],
       ),

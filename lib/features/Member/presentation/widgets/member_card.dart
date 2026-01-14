@@ -121,8 +121,10 @@ class MemberCard extends ConsumerWidget {
               PopupMenuItem(
                 value: 'delete',
                 onTap: () async {
-                  final controller = ref.read(memberStateProvider.notifier);
-                  await controller.removeMemberFromSpace(member: member);
+                  try{
+                    final controller = ref.read(memberStateProvider.notifier);
+                    await controller.removeMemberFromSpace(member: member);
+                  }catch(e){}
                 },
                 child: Row(
                   children: [

@@ -37,11 +37,7 @@ class PopupButtonSpace extends ConsumerWidget {
             ref.read(spaceControllerProvider.notifier);
             final canDelete = await controller.canSpaceDeleted(
                 spaceId: space.id);
-            if (canDelete) {
-              if (context.mounted) {
-                SnackBarService.showMessage(
-                    'Default space cannot be deleted');
-              }
+            if (!canDelete) {
               return;
             }
             await controller.deleteSpace(spaceId: space.id);

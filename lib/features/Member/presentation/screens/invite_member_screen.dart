@@ -30,7 +30,7 @@ class InviteMemberScreen extends ConsumerWidget {
                 height: height*.4,
                 decoration: BoxDecoration(color: Colors.transparent),
                 child: Image.asset(
-                  "assets/images/invite_member.png",
+                  "assets/images/invite_member.webp",
                 ),
               ),
               const SizedBox(height: 16),

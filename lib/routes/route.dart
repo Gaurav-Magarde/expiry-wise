@@ -1,9 +1,11 @@
-import 'package:expiry_wise_app/features/inventory/presentation/screens/add_new_item.dart';
-import 'package:expiry_wise_app/features/inventory/presentation/screens/barcode_scan_screen.dart';
-import 'package:expiry_wise_app/features/inventory/presentation/screens/all_items_screen.dart';
-import 'package:expiry_wise_app/features/inventory/presentation/screens/home_screen.dart';
-import 'package:expiry_wise_app/features/inventory/presentation/screens/item_detail_screen.dart';
+import 'package:expiry_wise_app/features/inventory/presentation/screens/add_new_item/add_new_item_screen.dart';
+import 'package:expiry_wise_app/features/home/presentation/screens/inventory_status/all_status_screen.dart';
+import 'package:expiry_wise_app/features/inventory/presentation/screens/barcode_scanner/barcode_scan_screen.dart';
+import 'package:expiry_wise_app/features/inventory/presentation/screens/all_items/all_items_screen.dart';
+import 'package:expiry_wise_app/features/home/presentation/screens/home_screen.dart';
+import 'package:expiry_wise_app/features/inventory/presentation/screens/item_detail/item_detail_screen.dart';
 import 'package:expiry_wise_app/features/Member/presentation/screens/member_screen.dart';
+import 'package:expiry_wise_app/features/inventory/presentation/screens/quick_list/quick_list_screen.dart';
 import 'package:expiry_wise_app/routes/presentation/screens/navigation_screen.dart';
 import 'package:expiry_wise_app/features/OnBoarding/presentation/screens/on_boarding_screen.dart';
 import 'package:expiry_wise_app/features/Profile/presentation/screens/profile_screen.dart';
@@ -14,6 +16,7 @@ import 'package:expiry_wise_app/routes/presentation/screens/screen_redirect.dart
 import 'package:go_router/go_router.dart';
 
 import '../features/Member/presentation/screens/invite_member_screen.dart';
+import '../features/expenses/presentation/screens/edit_expense.dart';
 
 class MYRoute {
   static GoRouter appRouter = GoRouter(
@@ -23,6 +26,11 @@ class MYRoute {
         name: 'memberScreen',
         path: '/memberScreen',
         builder: (context, state) => const MemberScreen(),
+      ),
+      GoRoute(
+        name: 'pantryStatusScreen',
+        path: '/pantryStatusScreen',
+        builder: (context, state) => const PantryStatusScreen(),
       ),
       GoRoute(
         name: 'inviteMemberScreen',
@@ -47,12 +55,12 @@ class MYRoute {
       GoRoute(
         name: 'spaceScreen',
         path: '/spaceScreen',
-        builder: (context, state) => AllSpacesScreens(),
+        builder: (context, state) => const AllSpacesScreens(),
       ),
       GoRoute(
         name: 'barcodeScanScreen',
         path: '/barcodeScanScreen',
-        builder: (context, state) => BarcodeScanScreen(),
+        builder: (context, state) => const BarcodeScanScreen(),
       ),
       GoRoute(
         name: 'addNewItemScreen',
@@ -81,7 +89,24 @@ class MYRoute {
       GoRoute(
         name: 'allItemsScreen',
         path: '/allItemsScreen',
-        builder: (context, state) =>  AllItemsScreen(),
+        builder: (context, state) => const AllItemsScreen(),
+      ),
+      GoRoute(
+        name: 'addNewExpense',
+        path: '/addNewExpense',
+        builder: (context, state){
+          final expense = state.uri.queryParameters['id'];
+
+          return AddNewExpense(expense);
+        },
+      ),
+      GoRoute(
+        name: 'quickListScreen',
+        path: '/quickListScreen',
+        builder: (context, state){
+
+          return const QuickListScreen();
+        },
       ),
 
       GoRoute(
@@ -104,6 +129,7 @@ class MYRoute {
   );
   static const String homeScreenRoute = 'homeScreen';
   static const String addNewItemScreen = 'addNewItemScreen';
+  static const String addNewExpense = 'addNewExpense';
   static const String onBoardingScreen = 'onBoardingScreen';
   static const String logInScreen = 'logInScreen';
   static const String profileScreen = 'profileScreen';
@@ -112,8 +138,10 @@ class MYRoute {
   static const String memberScreen = 'memberScreen';
   static const String spaceScreen = 'spaceScreen';
   static const String barcodeScanScreen = 'barcodeScanScreen';
+  static const String pantryStatusScreen = 'pantryStatusScreen';
   static const String joinSpaceScreen = 'joinSpaceScreen';
   static const String inviteMemberScreen = 'inviteMemberScreen';
+  static const String quickListScreen = 'quickListScreen';
   static const String screenRedirect = 'screenRedirect';
   static String get navigationScreen => 'navigationScreen';
 }

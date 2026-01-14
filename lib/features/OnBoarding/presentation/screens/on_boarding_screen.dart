@@ -33,14 +33,14 @@ class OnBoardingScreen extends ConsumerWidget {
               scrollDirection: Axis.horizontal,
               children: [
                 Center(
-                  child: Image.asset("assets/images/onboarding1.png",fit: BoxFit.fitWidth,),
+                  child: Image.asset("assets/images/onboarding1.webp",fit: BoxFit.fitWidth,),
                 ),
 
                 Center(
-                  child: Image.asset("assets/images/on_boarding2.png",fit: BoxFit.fitWidth,),
+                  child: Image.asset("assets/images/on_boarding2.webp",fit: BoxFit.fitWidth,),
                 ),
                 Center(
-                  child: Image.asset("assets/images/on_boarding3.png",fit: BoxFit.cover,),
+                  child: Image.asset("assets/images/on_boarding3.webp",fit: BoxFit.cover,),
                 ),
               ],
             ),
@@ -102,7 +102,7 @@ class OnBoardingScreen extends ConsumerWidget {
                       }
                     }
                   },
-                  child:const  Text("Continue"),
+                  child:const  Text("Get started"),
                 ),
               );
             },

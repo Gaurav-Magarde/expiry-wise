@@ -40,7 +40,7 @@ class MemberScreen extends ConsumerWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image.asset('assets/images/img_6.png'),
+                        Image.asset('assets/images/img_6.webp'),
                         const  SizedBox(height: 16),
                         Text(
                           "No Members added yet!",

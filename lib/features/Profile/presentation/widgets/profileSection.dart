@@ -148,7 +148,7 @@ class ProfileSection extends ConsumerWidget {
               return SettingTile(
                 icon: Icons.email_rounded,
                 iconColor: Colors.orangeAccent.shade400,
-                backgroundColor: Colors.orangeAccent.shade100,
+                backgroundColor: Colors.orange.shade50,
 
                 title: "Email",
                 subTitle: email.isEmpty ? "Add email address" : email,

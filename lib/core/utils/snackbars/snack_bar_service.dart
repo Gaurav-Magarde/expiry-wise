@@ -13,6 +13,7 @@ class SnackBarService {
 
     scaffoldMessengerKey.currentState?.showSnackBar(
       SnackBar(
+        padding: const EdgeInsets.symmetric(horizontal: 24,vertical: 16),
         content: Text(
           message,
           textAlign: TextAlign.center, // Text
@@ -21,9 +22,6 @@ class SnackBarService {
         backgroundColor: Colors.white,
 
         behavior: SnackBarBehavior.floating,
-
-        width: 200,
-
         elevation: 0,
         duration: const Duration(seconds: 2),
 
@@ -60,7 +58,6 @@ class SnackBarService {
 
   // INTERNAL HELPER
   static void _showSnackBar(String message, {required Color color, required IconData icon}) {
-    // Remove current snackbar if one is already showing (optional)
     scaffoldMessengerKey.currentState?.removeCurrentSnackBar();
 
     scaffoldMessengerKey.currentState?.showSnackBar(

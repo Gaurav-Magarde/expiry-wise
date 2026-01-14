@@ -23,10 +23,8 @@ class NavigationScreen extends ConsumerWidget {
 
       },
       child: Scaffold(
-        // Body: Jo screen controller me selected hai wo dikhao
         body: navigationController.currentScreen,
 
-        // 🔥 2. GNav: Modern Bottom Bar
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -64,6 +62,10 @@ class NavigationScreen extends ConsumerWidget {
                 GButton(
                   icon: Icons.shopping_bag_rounded, // Inventory ke liye badhiya icon
                   text: 'Inventory',
+                ),
+                GButton(
+                  icon: Icons.account_balance_wallet_outlined,
+                  text: 'Expense',
                 ),
                 GButton(
                   icon: Icons.settings_rounded,

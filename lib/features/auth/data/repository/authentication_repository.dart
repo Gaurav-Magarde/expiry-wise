@@ -23,7 +23,6 @@ class AuthenticationRepository{
         final instance =  GoogleSignIn();
         await instance.signOut();
         final GoogleSignInAccount? googleUser = await instance.signIn();
-        // ya supportsAuthenticate() ke hisaab se
 
         if (googleUser == null) {
           return null;
@@ -51,7 +50,7 @@ class AuthenticationRepository{
       }on Exception {
         throw TExceptions().message;
       }catch (e){
-        throw 'some went wrong';
+        throw 'something went wrong $e';
       }
 
   }

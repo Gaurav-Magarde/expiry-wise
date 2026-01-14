@@ -32,12 +32,12 @@ class LoginStateController extends StateNotifier<bool> {
   ;
 
   Future<void> continueWithGoogle() async {
+    final link = ref.keepAlive();
     try {
-      // await ref.read(profileStateProvider.notifier).deleteUser();
-      
+
       final isInternet = ref.read(isInternetConnectedProvider);
       if(!isInternet) {
-        SnackBarService.showMessage('please check your IC');
+        SnackBarService.showMessage('please check your internet connection');
         return;
       }
       final credential = await authRepository.loginWithGoogle();
@@ -88,19 +88,20 @@ class LoginStateController extends StateNotifier<bool> {
       MYRoute.appRouter.goNamed(MYRoute.screenRedirect);
     } catch (e) {
       SnackBarService.showError('Login with google failed. $e');
+    }finally{
+     link.close();
     }
 
   }
 
   Future<void> continueAsGuest() async {
+    final link = ref.keepAlive();
     try{
       String id = Uuid().v1();
-      final fireStoreService = ref.read(fireStoreServiceProvider);
       final spaceRepo = ref.read(spaceRepoProvider);
 
       final isInternet = ref.read(isInternetConnectedProvider);
       final isUser = ref.read(loggedInUserProvider);
-      String spaceId = Uuid().v1();
       String name = "Guest_${_generateNameSuffix()}";
       String email = "";
       UserModel user = UserModel(
@@ -120,7 +121,9 @@ class LoginStateController extends StateNotifier<bool> {
       await _prefs.setCurrentUserId(user.id);
       MYRoute.appRouter.goNamed(MYRoute.screenRedirect);
     }catch (e){
-      SnackBarService.showError('guest login failed $e');
+      SnackBarService.showError('guest login failed ');
+    }finally{
+      link.close();
     }
   }
 
@@ -142,4 +145,4 @@ class LoginStateController extends StateNotifier<bool> {
   }
 }
 
-final isLoginProvider = StateProvider<bool>((ref)=>false);
+final isLoginProvider = StateProvider.autoDispose<bool>((ref)=>false);

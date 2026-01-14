@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:expiry_wise_app/features/expenses/data/models/expense_model.dart';
 import 'package:expiry_wise_app/features/inventory/data/models/item_model.dart';
 import 'package:expiry_wise_app/features/Member/data/models/member_model.dart';
 import 'package:expiry_wise_app/features/Space/data/model/space_card_model.dart';
 import 'package:expiry_wise_app/features/Space/data/model/space_model.dart';
 import 'package:expiry_wise_app/features/User/data/models/user_model.dart';
+import 'package:expiry_wise_app/features/inventory/data/models/quicklist_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -19,8 +21,14 @@ class SqfLiteSetup {
   final _itemController = StreamController<List<ItemModel>>.broadcast();
   Stream<List<ItemModel>> get itemStream => _itemController.stream;
 
+
+  final _expensesStreamController = StreamController<List<ExpenseModel>>.broadcast();
+  Stream<List<ExpenseModel>> get expenseStream => _expensesStreamController.stream;
 /// ----------------------------------------------------[Database Creation]-----------------------------------
 
+
+  final  _quickListStreamController = StreamController<List<QuickListModel>>.broadcast();
+  Stream<List<QuickListModel>> get quickListStream => _quickListStreamController.stream;
 
   Future<Database> get getDatabase async {
     if (_db != null) return _db!;
@@ -52,10 +60,11 @@ class SqfLiteSetup {
           'CREATE TABLE items('
           'id TEXT PRIMARY KEY,'
           'name TEXT,'
-          'expiry_date TEXT NOT NULL,updated_at TEXT,'
+          'notify_config TEXT,'
+          'expiry_date TEXT,updated_at TEXT,'
           'image TEXT ,image_network TEXT ,'
-          'quantity INTEGER,'
-          'note TEXT NOT NULL,unit TEXT,'
+          'quantity INTEGER,finished INTEGER DEFAULT 0,price REAL,is_expense_linked INTEGER DEFAULT 0,'
+          'note TEXT ,unit TEXT,'
           'user_id TEXT NOT NULL,space_id TEXT NOT NULL,'
           'category TEXT,added_date TEXT NOT NULL,is_synced INTEGER NOT NULL DEFAULT 0,is_deleted INTEGER NOT NULL DEFAULT 0,'
           'FOREIGN KEY (user_id) REFERENCES users (id) ,'
@@ -63,6 +72,15 @@ class SqfLiteSetup {
         );
         await db.execute(
           'CREATE TABLE members(id TEXT PRIMARY KEY,name TEXT,user_id TEXT NOT NULL,role TEXT NOT NULL,email TEXT,space_id TEXT NOT NULL,photo TEXT ,is_synced INTEGER NOT NULL DEFAULT 0,is_deleted INTEGER NOT NULL DEFAULT 0 )',
+        );
+
+
+        await db.execute(
+          'CREATE TABLE expenses(id TEXT PRIMARY KEY,title TEXT,updated_at TEXT,category TEXT,note TEXT,amount double,payer_name TEXT,payer_id TEXT,expense_date TEXT,space_id TEXT NOT NULL,is_synced INTEGER NOT NULL DEFAULT 0)',
+        );
+
+        await db.execute(
+          'CREATE TABLE quick_list(id TEXT PRIMARY KEY,title TEXT,updated_at TEXT,space_id TEXT NOT NULL,is_synced INTEGER NOT NULL DEFAULT 0,is_completed INTEGER NOT NULL DEFAULT 0)',
         );
       },
     );
@@ -97,18 +115,6 @@ class SqfLiteSetup {
     }
   }
 
-  Future<void> deleteUser(String userId) async {
-    try {
-      final db = await getDatabase;
-      db.insert(
-        "users",{'is_deleted' : 1}
-      );
-      await markUserAsUnSynced(userId);
-    } catch (e) {
-      throw Exception("DB ERROR");
-    }
-  }
-
   Future<UserModel?> getUserFromId(String currentUserId) async {
     try {
       final db = await getDatabase;
@@ -128,7 +134,6 @@ class SqfLiteSetup {
         return UserModel.fromMap(map.first);
       }
     } catch (e) {
-       print(Exception(e));
          throw Exception(e);
     }
   }
@@ -172,8 +177,7 @@ class SqfLiteSetup {
   Future<void> insertItem(ItemModel item) async {
     try {
       final Map<String, dynamic> mapItem = item.toMap();
-      if (item.expiryDate.isEmpty ||
-          item.name.isEmpty ||
+      if (          item.name.isEmpty ||
           item.category.isEmpty ||
           item.spaceId ==null ||
           item.userId == null ||
@@ -192,8 +196,8 @@ class SqfLiteSetup {
     try {
         final db = await getDatabase;
         final spaceId = items.first.spaceId;
-        items.map((item){
-          if (item.expiryDate.isEmpty ||
+        for(ItemModel item in items) {
+          if (
               item.name.isEmpty ||
               item.category.isEmpty ||
               item.spaceId ==null ||
@@ -203,9 +207,9 @@ class SqfLiteSetup {
             return;
           }
           final Map<String, dynamic> mapItem = item.toMap();
-          db.insert('items', mapItem, conflictAlgorithm: ConflictAlgorithm.replace);
+          await db.insert('items', mapItem, conflictAlgorithm: ConflictAlgorithm.replace);
 
-        });
+        }
 
       refreshItems(spaceId: spaceId!);
     } catch (e) {
@@ -216,7 +220,6 @@ class SqfLiteSetup {
   Future<void> refreshItems({required String? spaceId}) async {
     try{
       List<ItemModel> items = [];
-        await Future.delayed(Duration(seconds: 1));
       if(spaceId!=null && spaceId.isNotEmpty){
         final db = await getDatabase;
         final maps = await db.query(
@@ -224,6 +227,7 @@ class SqfLiteSetup {
           where: "space_id = ?",
           whereArgs: [spaceId],
         );
+
         items = maps
             .map((item) => ItemModel.fromMap(item: item))
             .toList();
@@ -282,6 +286,7 @@ class SqfLiteSetup {
 
   Future<String?> updateItem(ItemModel item) async {
     try {
+      print("now updating ${item.toMap()}");
       final Map<String, dynamic> mapItem = item.toMap();
       final db = await getDatabase;
       final prev = await db.query(
@@ -291,12 +296,11 @@ class SqfLiteSetup {
       );
       await db.update('items',where: "id = ?",whereArgs: [item.id], mapItem);
       refreshItems(spaceId: item.spaceId!,);
-      // return null;
-      return prev.first['image_network'] as String? ?? '';
+      final string  = prev.first['image_network'] as String?;
+      return string ;
     } catch (e) {
       return null;
     }
-    return null;
   }
 
 
@@ -310,13 +314,14 @@ class SqfLiteSetup {
     return map;
   }
 
-  Future<void> deleteItem({required String spaceId, required String itemId}) async {
+  Future<bool> deleteItem({required String spaceId, required String itemId}) async {
     try{
       final db = await getDatabase;
-      await db.delete('items',whereArgs: [itemId],where: 'id = ?');
+      final affect = await db.delete('items',whereArgs: [itemId],where: 'id = ?');
      refreshItems(spaceId: spaceId,);
+     return affect == 1;
     }catch(e){
-      throw " ";
+      return false;
     }
   }
 
@@ -338,9 +343,6 @@ class SqfLiteSetup {
   Future<void> createSpace({required SpaceModel space}) async {
     final db = await getDatabase;
     final map = space.getMap();
-    print('=====================================');
-    print(map);
-    print("=====================================");
     await db.insert('spaces', map,conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
@@ -492,6 +494,18 @@ class SqfLiteSetup {
         return MemberModel.fromLocal(member);
       }).toList();
       return list;
+    }catch(e){
+      throw " ";
+    }
+  }
+  Future<MemberModel?> fetchSingleMemberFromLocal({required String spaceId,required String userId,})async {
+    try{
+      final db = await getDatabase;
+      final mem = await db.query('members', where: "space_id = ? AND user_id = ?",whereArgs: [spaceId,userId]);
+       for(final member in mem){
+        return MemberModel.fromLocal(member);
+      };
+      return null;
     }catch(e){
       throw " ";
     }
@@ -687,6 +701,79 @@ class SqfLiteSetup {
     }catch(e){
 
     }
+  }
+
+  Future<void> saveExpense({required ExpenseModel expense})async{
+    final db = await getDatabase;
+    await db.insert('expenses', expense.toMap(),conflictAlgorithm: ConflictAlgorithm.replace);
+    refreshExpense(spaceId: expense.spaceId);
+  }
+
+  Future<void> deleteExpense({required ExpenseModel expense})async{
+    final db = await getDatabase;
+    await db.delete('expenses', where: 'id = ?',whereArgs: [expense.id]);
+    refreshExpense(spaceId: expense.spaceId);
+  }
+
+  Future<void> loadExpense({required String spaceId})async{
+    refreshExpense(spaceId: spaceId);
+  }
+
+  Future<List<ExpenseModel>> fetchExpense({required String spaceId})async{
+    final db = await getDatabase;
+    final list = await db.query('expenses',whereArgs: [spaceId],where: 'space_id = ?');
+    return list.map((expense)=>ExpenseModel.fromMap(map: expense)).toList();
+  }
+
+  Future<List<ExpenseModel>> fetchNonSyncedExpense()async{
+    final db = await getDatabase;
+    final list = await db.query('expenses',whereArgs: [0],where: 'is_synced = ?');
+    return list.map((expense)=>ExpenseModel.fromMap(map: expense)).toList();
+  }
+
+  Future<void> refreshExpense({required String spaceId})async{
+    final db = await getDatabase;
+
+    final list = await db.query('expenses',whereArgs: [spaceId],where: 'space_id = ?');
+    final expenses = list.map((expense)=>ExpenseModel.fromMap(map: expense)).toList();
+    _expensesStreamController.sink.add(expenses);
+  }
+
+
+  Future<void> saveQuickListItem({required QuickListModel item})async{
+    final db = await getDatabase;
+    await db.insert('quick_list', item.toMap(),conflictAlgorithm: ConflictAlgorithm.replace);
+    refreshQuickList(spaceId: item.spaceId);
+  }
+
+  Future<void> deleteQuickListItem({required QuickListModel item})async{
+    final db = await getDatabase;
+    await db.delete('quick_list', where: 'id = ?',whereArgs: [item.id]);
+    refreshQuickList(spaceId: item.spaceId);
+  }
+
+  Future<void> loadQuickListItem({required String spaceId})async{
+    refreshQuickList(spaceId: spaceId);
+  }
+
+  Future<List<QuickListModel>> fetchQuickListItem({required String spaceId})async{
+    final db = await getDatabase;
+    final list = await db.query('quick_list',whereArgs: [spaceId],where: 'space_id = ?');
+    return list.map((item)=>QuickListModel.fromMap(map: item)).toList();
+  }
+
+  Future<List<QuickListModel>> fetchNonSyncedQuickListItem()async{
+    final db = await getDatabase;
+    final list = await db.query('quick_list',whereArgs: [0],where: 'is_synced = ?');
+    return list.map((item)=>QuickListModel.fromMap(map: item)).toList();
+  }
+
+  Future<void> refreshQuickList({required String spaceId})async{
+    final db = await getDatabase;
+
+    final list = await db.query('quick_list',whereArgs: [spaceId],where: 'space_id = ?');
+    final itemList = list.map((item)=>QuickListModel.fromMap(map: item)).toList();
+    _quickListStreamController.sink.add(itemList);
   }
 
 }

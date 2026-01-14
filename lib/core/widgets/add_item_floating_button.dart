@@ -25,9 +25,9 @@ class AddItemFloatingButton extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(iconData, color: Colors.white),
+            Icon(iconData, color: Colors.white,size: 18,),
             SizedBox(width: 8,),
-            Text(label,style: Theme.of(context).textTheme.titleMedium!.apply(color: Colors.white),)
+            Text(label,style: Theme.of(context).textTheme.labelMedium!.apply(color: Colors.white),)
           ],),
       ),
     );

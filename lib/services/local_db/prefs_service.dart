@@ -91,6 +91,23 @@ class PrefsService{
     }
   }
 
+ Future<bool>  getItemDeleteAlert() async {
+    try{
+      return await prefs.getBool("item_delete_alert")??true;
+    }catch(e){
+      throw " ";
+    }
+  }
+
+  Future<void> setItemDeleteAlert(bool status) async {
+    try{
+
+      return await prefs.setBool("item_delete_alert",status);
+    }catch(e){
+      throw " ";
+    }
+  }
+
   Future<String> setNotificationTime(TimeOfDay time) async {
     try{
       final hour = time.hour.toString().padLeft(2,'0');
@@ -115,6 +132,30 @@ class PrefsService{
       throw " ";
     }
   }
+
+
+
+  static const String _keyNotifyDays = 'notify_days';
+
+  final List<int> defaultDays = [1, 7];
+  final List<int> allDaysNotify = [0,1,2,7,14,28];
+
+  // Load Saved Days
+    Future<List<int>> getNotificationDays() async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<String>? saved = prefs.getStringList(_keyNotifyDays);
+
+    if (saved == null) return defaultDays;
+    return saved.map((e) => int.parse(e)).toList();
+  }
+
+  // Save Days
+  Future<void> saveNotificationDays(List<int> days) async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> stringList = days.map((e) => e.toString()).toList();
+    await prefs.setStringList(_keyNotifyDays, stringList);
+  }
+
 }
 
 

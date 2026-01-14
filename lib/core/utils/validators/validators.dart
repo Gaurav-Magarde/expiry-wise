@@ -6,9 +6,16 @@ class Validators{
 
   static bool validateExpiry({required String? expiry}) {
     try{
-      final now = DateTime.now();
-      if(expiry==null || expiry.isEmpty) return false;
       return true;
+    }catch(c){
+      return false;
+    }
+  }
+
+  static bool validateAmount({required String? amount}) {
+    try{
+      final amountNum = double.tryParse(amount??'');
+      return amountNum!=null && amountNum>=1;
     }catch(c){
       return false;
     }

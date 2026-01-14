@@ -9,15 +9,17 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/colors.dart';
 
 class AlertBoxDeleteUser extends ConsumerWidget {
-  const AlertBoxDeleteUser({super.key});
-
+  const AlertBoxDeleteUser(this.title, this.onPressed, this.message, {super.key});
+  final String title;
+  final VoidCallback? onPressed;
+  final String message;
   @override
   Widget build(BuildContext context, ref) {
     return AlertDialog(
       elevation: 5,
       backgroundColor: Colors.white,
       title: Text(
-        "Delete user?",
+      title,
         style: Theme.of(context).textTheme.titleMedium!.apply(
           color: Colors.black87,
           fontWeightDelta: 2,
@@ -25,7 +27,7 @@ class AlertBoxDeleteUser extends ConsumerWidget {
         ),
       ),
       content: Text(
-        'This action cannot be undone.All the data associated with the user will be permanently deleted.',
+        message,
         style: Theme.of(
           context,
         ).textTheme.titleMedium!.apply(color: Colors.black87),
@@ -43,30 +45,7 @@ class AlertBoxDeleteUser extends ConsumerWidget {
           ),
         ),
         TextButton(
-          onPressed: () async {
-            FullScreenLoader.showLoader(
-              context,
-              'Deleting all spaces & items...',
-            );
-            try {
-              final controller = ref.read(profileStateProvider.notifier);
-              await controller.deleteUser();
-              if (context.mounted) {
-                FullScreenLoader.stopLoader(context);
-                context.pop();
-              }
-              ref.read(screenRedirectProvider).screenRedirect();
-            } catch (e) {
-              if (context.mounted) {
-                FullScreenLoader.stopLoader(context);
-                context.pop();
-              }
-
-              SnackBarService.showError(
-                'Delete user failed.please try again later! $e',
-              );
-            }
-          },
+          onPressed: onPressed,
           child: Text(
             'Delete',
             style: Theme.of(

@@ -32,17 +32,7 @@ class AddItemRepository {
     : _sqfLite = ref.read(sqfLiteSetupProvider)
 ;
   Future<ItemModel?> insertItem({
-    String? id,
-    String? image,
-    required String? imageNetwork,
-    required String name,
-    required String category,
-    required int quantity,
-    required String note,
-    String? addedDate,
-    String? updatedAt,
-    required String expiryDate,
-    required String unit,
+    required ItemModel item
   }) async {
     try {
       final user = ref.read(currentUserProvider);
@@ -52,48 +42,13 @@ class AddItemRepository {
         loading: () => null,
       );
       if(currentUser==null) return null;
-      final currentUserId = currentUser.id;
       final isInternet = ref.read(isInternetConnectedProvider);
       final fireStoreService = ref.read(fireStoreServiceProvider);
-      final currentSpace = ref.read(currentSpaceProvider);
-      String? currentSpaceId = currentSpace.when(
-        data: (space) => space?.id,
-        error: (e, s) => '',
-        loading: () => '',
-      );
-      if (currentSpaceId == null) {
-        SnackBarService.showError('Adding product failed no space found');
-        return null;
-      }
-      if (expiryDate.isEmpty ||
-          name.isEmpty ||
-          category.isEmpty ||
-          currentSpaceId.isEmpty ||
-          currentUserId.isEmpty) {
-        return null;
-      }
-      ItemModel item = ItemModel(
-        updatedAt: updatedAt?? DateTime.now().toString(),
-        imageNetwork: imageNetwork??'',
-        unit: unit,
-        id: id,
-        image: image ?? "",
-        name: name,
-        expiryDate: expiryDate,
-        category: category,
-        quantity: quantity,
-        note: note,
-        addedDate: addedDate ?? DateFormat('yyyy-MM-dd').format(DateTime.now()),
-        userId: currentUserId,
-        spaceId: currentSpaceId,
-
-      );
-      print('Added product added date is= > ${item.addedDate}');
       await _sqfLite.insertItem(item);
       if (isInternet && currentUser.userType=='google') {
         await fireStoreService.insertItemToFirebase(
-          currentUserId,
-          currentSpaceId,
+          item.userId??'',
+          item.spaceId??'',
           item,
         );
       }
@@ -115,16 +70,20 @@ class AddItemRepository {
 
   Future<ItemModel?> updateItem({
     String? id,
+    required List<int> notificationDays,
     required String? image,
     required String? imageNetwork,
     required String name,
     required String category,
     required int quantity,
     required String note,
+    required double? price,
+    required bool? isExpenseLinked,
     String? addedDate,
     String?  updatedAt,
-    required String expiryDate,
+    required String? expiryDate,
     required String unit,
+    required int finished,
 
   }) async {
     try {
@@ -145,7 +104,7 @@ class AddItemRepository {
         SnackBarService.showError('Adding product failed no space found');
         return null;
       }
-      if (expiryDate.isEmpty ||
+      if (
           name.isEmpty ||
           category.isEmpty ||
           currentSpaceId.isEmpty ||
@@ -154,6 +113,10 @@ class AddItemRepository {
         return null;
       }
       ItemModel item = ItemModel(
+        price: price,
+        isExpenseLinked:isExpenseLinked,
+        finished: finished,
+        notifyConfig: notificationDays,
         updatedAt: updatedAt?? DateTime.now().toString(),
         imageNetwork: imageNetwork??'',
         unit: unit,
@@ -169,12 +132,11 @@ class AddItemRepository {
         spaceId: currentSpaceId,
       );
       final fireStoreService = ref.read(fireStoreServiceProvider);
-
-         await _sqfLite.updateItem(item);
+        final res =  await _sqfLite.updateItem(item);
+        if(res==null) return null;
      if(isInternet && currentUser.userType=='google') {
-       await fireStoreService.updateItemFromFirebase(
-        map: item.toMap(),
-        id: item.spaceId ?? '',
+       await fireStoreService.insertItemToFirebase(
+       item.userId!,item.spaceId!,item
       );
 
      }
@@ -194,10 +156,14 @@ class AddItemRepository {
     }
   }
 
-  Future<ApiProductModel> fetchItemByBarcode(String next) async {
+  Future<ApiProductModel?> fetchItemByBarcode(String next) async {
     try {
       final data = await _apiService.getProductByBarcode(next);
-      final ApiProductModel product = ApiProductModel.fromMap(data!);
+      if(data==null){
+        SnackBarService.showMessage("Item not found");
+        return null;
+      }
+      final ApiProductModel product = ApiProductModel.fromMap(data);
       return product;
     } on FirebaseAuthException catch (e) {
       throw TFirebaseAuthException(e.code).message;

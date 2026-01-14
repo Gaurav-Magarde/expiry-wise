@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:expiry_wise_app/core/widgets/chips/notification_day_chips.dart';
 import 'package:expiry_wise_app/features/Profile/presentation/controllers/profile_state_controller.dart';
 import 'package:expiry_wise_app/features/Profile/presentation/widgets/profileSection.dart';
 import 'package:expiry_wise_app/features/Space/presentation/controllers/space_controller.dart';
@@ -10,9 +11,11 @@ import 'package:expiry_wise_app/core/utils/loaders/full_screen_loader.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/colors.dart';
+import '../../../../routes/presentation/controllers/route_controller.dart';
 import '../widgets/alert_box_delete_user.dart';
 import '../widgets/heading_section.dart';
 import '../widgets/setting_tile.dart';
@@ -26,20 +29,21 @@ class ProfileScreen extends ConsumerWidget {
     final userController = ref.watch(currentUserProvider).value;
     final currentUserType = userController?.userType ?? '';
     final loginText = currentUserType == 'guest' ? "Login" : 'Log out';
+
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
       body: SingleChildScrollView(
         child: Column(
           children: [
             Container(
-              margin:const  EdgeInsets.only(top: 50,bottom: 16),
-              decoration: BoxDecoration(color: Colors.grey.shade200,),
+              margin: const EdgeInsets.only(top: 50, bottom: 16),
+              decoration: BoxDecoration(color: Colors.grey.shade200),
               child: Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const  SizedBox(width: 30,),
+                    const SizedBox(width: 30),
                     Container(
                       clipBehavior: Clip.hardEdge,
                       decoration: BoxDecoration(
@@ -73,59 +77,65 @@ class ProfileScreen extends ConsumerWidget {
                         },
                       ),
                     ),
-                    const SizedBox(width: 24,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Consumer(
-                          builder: (_, ref, __) {
-                            final name = ref.watch(
-                              profileStateProvider.select((s) => s.name),
-                            );
-                            final mail = ref.watch(
-                              profileStateProvider.select((s) => s.email),
-                            );
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  name,
-                                  style: Theme.of(context).textTheme.titleLarge!
-                                      .apply(fontWeightDelta: 3),
-                                  overflow: TextOverflow.ellipsis,
+                    const SizedBox(width: 24),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Consumer(
+                            builder: (_, ref, __) {
+                              final name = ref.watch(
+                                profileStateProvider.select((s) => s.name),
+                              );
+                              final mail = ref.watch(
+                                profileStateProvider.select((s) => s.email),
+                              );
+                              return Expanded(
+                                flex: 1,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      name,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge!
+                                          .apply(fontWeightDelta: 3),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      mail,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall!
+                                          .apply(color: Colors.purple),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
                                 ),
-                                const  SizedBox(height: 4),
-                                Text(
-                                  mail,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleSmall!
-                                      .apply(color: Colors.purple),
-                                  overflow: TextOverflow.ellipsis,
-
-                                ),
-                                const SizedBox(height: 8,)
-                              ],
-                            );
-                          },
-                        ),
-                      ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
-            Divider(height: 1,thickness: .5,color: Colors.grey.shade500,),
-            const SizedBox(height: 16,)
-,
+            Divider(height: 1, thickness: .5, color: Colors.grey.shade500),
+            const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(),
               child: Column(
                 children: [
-
-                  const HeadingSection(heading: "Account Details", buttonName: ''),
+                  const HeadingSection(
+                    heading: "Account Details",
+                    buttonName: '',
+                  ),
                   const SizedBox(height: 8),
 
                   const ProfileSection(),
@@ -133,287 +143,457 @@ class ProfileScreen extends ConsumerWidget {
 
                   Consumer(
                     builder: (context, ref, child) {
-                      return const  HeadingSection(heading: "WORKSPACE", buttonName: '');
+                      return const HeadingSection(
+                        heading: "WORKSPACE",
+                        buttonName: '',
+                      );
                     },
                   ),
                   const SizedBox(height: 8),
 
                   Container(
-                    margin:const  EdgeInsets.symmetric(horizontal: 0),
-                    padding:const  EdgeInsets.symmetric(vertical: 8,horizontal: 12),
+                    margin: const EdgeInsets.symmetric(horizontal: 0),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 12,
+                    ),
                     decoration: BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            offset: Offset(0, 3),
-                            blurStyle: BlurStyle.outer,
-                            blurRadius: 7,
-                            color: Colors.grey.shade200,
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          offset: Offset(0, 3),
+                          blurStyle: BlurStyle.outer,
+                          blurRadius: 7,
+                          color: Colors.grey.shade200,
+                        ),
+                      ],
+                      border: const Border(),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      children: [
+                        Consumer(
+                          builder: (context, ref, child) {
+                            return SettingTile(
+                              onTap: () {
+                                MYRoute.appRouter.pushNamed(
+                                  MYRoute.memberScreen,
+                                );
+                              },
+
+                              icon: Icons.people_outline,
+                              iconColor: Colors.purple.shade400,
+                              backgroundColor: Colors.purple.shade50,
+                              title: "Manage member",
+                              subTitle: 'Manage members and friends',
+                              suffixWidget: Icon(
+                                Icons.chevron_right,
+                                color: Colors.grey.shade700,
+                              ),
+                            );
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Divider(height: 1, color: Colors.grey[300]),
+                        ),
+                        SettingTile(
+                          icon: Icons.person_add_alt_1,
+                          iconColor: Colors.green.shade400,
+                          backgroundColor: Colors.green.shade50,
+                          title: "Invite Member",
+                          onTap: () {
+                            context.pushNamed(MYRoute.inviteMemberScreen);
+                          },
+                          subTitle: 'Add family member and friends',
+                          suffixWidget: Icon(
+                            Icons.add,
+                            color: Colors.grey.shade700,
                           ),
-                        ],
-                        border:const  Border(),
-                        borderRadius: BorderRadius.circular(8),),
-                    child: Column(children: [
-                      Consumer(
-                        builder: (context, ref, child) {
-                          return SettingTile(
-                            onTap: () {
-                              MYRoute.appRouter.pushNamed(MYRoute.memberScreen);
-                            },
-
-                            icon: Icons.people_outline,
-                            iconColor: Colors.purple.shade400,
-                            backgroundColor: Colors.purple.shade100,
-                            title: "Manage member",
-                            subTitle: 'Manage members and friends',
-                            suffixWidget: Icon(
-                              Icons.chevron_right,
-                                color:Colors.grey.shade700
-                            ),
-                          );
-                        },
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                        child: Divider(height: 1, color: Colors.grey[300]),
-                      ),
-                      SettingTile(
-
-
-                        icon: Icons.person_add_alt_1,
-                        iconColor: Colors.green.shade400,
-                        backgroundColor: Colors.green.shade100,
-                        title: "Invite Member",
-                        onTap: () {
-                          context.pushNamed(MYRoute.inviteMemberScreen);
-                        },
-                        subTitle: 'Add family member and friends',
-                        suffixWidget: Icon(Icons.add, color:Colors.grey.shade700),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                        child: Divider(height: 1, color: Colors.grey[300]),
-                      ),
-                      SettingTile(
-                        onTap: () {
-                          ref.invalidate(spaceControllerProvider);
-                          context.pushNamed(MYRoute.spaceScreen);
-                        },
-
-
-                        icon: Icons.space_dashboard_sharp,
-                        iconColor: Colors.pinkAccent.shade400,
-                        backgroundColor: Colors.pink.shade50,
-                        title: "My Spaces",
-                        subTitle: 'manage all your spaces',
-                        suffixWidget: Icon(
-                          Icons.chevron_right,color:Colors.grey.shade700
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                        child: Divider(height: 1, color: Colors.grey[300]),
-                      ),
-                      SettingTile(
-                        onTap: () async {
-                          context.pushNamed(MYRoute.joinSpaceScreen);
-                        },
-
-
-                        icon: Icons.add_circle_sharp,
-                        iconColor: Colors.lightBlue.shade400,
-                        backgroundColor: Colors.lightBlue.shade100,
-                        title: "Join new space",
-                        subTitle: 'Add more places to manage different places',
-                        suffixWidget: IconButton(
-                          icon: Icon(Icons.add, color:Colors.grey.shade700),
-                          onPressed: () {},
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Divider(height: 1, color: Colors.grey[300]),
                         ),
-                      ),
+                        SettingTile(
+                          onTap: () {
+                            ref.invalidate(spaceControllerProvider);
+                            context.pushNamed(MYRoute.spaceScreen);
+                          },
 
-                    ],),
+                          icon: Icons.space_dashboard_sharp,
+                          iconColor: Colors.pinkAccent.shade400,
+                          backgroundColor: Colors.pink.shade50,
+                          title: "My Spaces",
+                          subTitle: 'manage all your spaces',
+                          suffixWidget: Icon(
+                            Icons.chevron_right,
+                            color: Colors.grey.shade700,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Divider(height: 1, color: Colors.grey[300]),
+                        ),
+                        SettingTile(
+                          onTap: () async {
+                            context.pushNamed(MYRoute.joinSpaceScreen);
+                          },
+
+                          icon: Icons.add_circle_sharp,
+                          iconColor: Colors.lightBlue.shade400,
+                          backgroundColor: Colors.lightBlue.shade50,
+                          title: "Join new space",
+                          subTitle:
+                              'Add more places to manage different places',
+                          suffixWidget: IconButton(
+                            icon: Icon(Icons.add, color: Colors.grey.shade700),
+                            onPressed: () {},
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  const  SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
                   Consumer(
                     builder: (context, ref, child) {
-                      return const HeadingSection(heading: "PREFERENCES", buttonName: '');
+                      return const HeadingSection(
+                        heading: "PREFERENCES",
+                        buttonName: '',
+                      );
                     },
                   ),
                   const SizedBox(height: 8),
 
                   Container(
-                    margin:const  EdgeInsets.symmetric(horizontal: 0),
-                    padding:const  EdgeInsets.symmetric(vertical: 8,horizontal: 12),
+                    margin: const EdgeInsets.symmetric(horizontal: 0),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 12,
+                    ),
                     decoration: BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            offset: Offset(0, 3),
-                            blurStyle: BlurStyle.outer,
-                            blurRadius: 7,
-                            color: Colors.grey.shade200,
-                          ),
-                        ],
-                        border:const  Border(),
-                        borderRadius: BorderRadius.circular(8),),
-                    child: Column(children: [
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          offset: Offset(0, 3),
+                          blurStyle: BlurStyle.outer,
+                          blurRadius: 7,
+                          color: Colors.grey.shade200,
+                        ),
+                      ],
+                      border: const Border(),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      children: [
+                        Consumer(
+                          builder: (_, ref, __) {
+                            final notification = ref.watch(
+                              profileStateProvider.select(
+                                (s) => s.notification,
+                              ),
+                            );
+                            return SettingTile(
+                              onTap: () {},
 
-                      Consumer(
-                        builder: (_, ref, __) {
-                          final notification = ref.watch(
-                            profileStateProvider.select((s) => s.notification),
-                          );
-                          return SettingTile(
-                            onTap: () {},
+                              icon: Icons.notifications_active,
+                              iconColor: Colors.cyanAccent.shade400,
+                              backgroundColor: Colors.cyan.shade50,
+                              title: "Notification alerts",
+                              subTitle: 'send me notification before expires',
+                              suffixWidget: CupertinoSwitch(
+                                value: notification,
+                                activeTrackColor: EColors.accentPrimary,
 
+                                onChanged: (v) async {
+                                  await ref
+                                      .read(profileStateProvider.notifier)
+                                      .changeNotificationAlert(v);
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Divider(height: 1, color: Colors.grey[300]),
+                        ),
 
-                            icon: Icons.notifications_active,
-                            iconColor: Colors.cyanAccent.shade400,
-                            backgroundColor: Colors.cyanAccent.shade100,
-                            title: "Notification alerts",
-                            subTitle: 'send me notification before expires',
-                            suffixWidget: CupertinoSwitch(
-                              value: notification,
-                              activeTrackColor: EColors.accentPrimary,
+                        Consumer(
+                          builder: (_, ref, __) {
+                            final notification = ref.watch(
+                              profileStateProvider.select((s) => s.itemAlert),
+                            );
+                            return SettingTile(
+                              onTap: () {},
 
-                              onChanged: (v) async {
-                                await ref
-                                    .read(profileStateProvider.notifier)
-                                    .changeNotificationAlert(v);
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                        child: Divider(height: 1, color: Colors.grey[300]),
-                      ),
-                      SettingTile(
+                              icon: Icons.delete_forever_outlined,
+                              iconColor: Colors.redAccent.shade400,
+                              backgroundColor: Colors.red.shade50,
+                              title: "Delete alerts",
+                              subTitle: 'Alert me before delete',
+                              suffixWidget: CupertinoSwitch(
+                                value: notification,
+                                activeTrackColor: EColors.accentPrimary,
 
+                                onChanged: (v) async {
+                                  await ref
+                                      .read(profileStateProvider.notifier)
+                                      .changeItemDeleteAlert(v);
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Divider(height: 1, color: Colors.grey[300]),
+                        ),
 
-                        icon: Icons.alarm_sharp,
-                        iconColor: Colors.deepOrange.shade400,
-                        backgroundColor: Colors.deepOrange.shade100,
-                        onTap: () async {
-                          final TimeOfDay initialTime = await profileController
-                              .getNotificationTime();
-                          final TimeOfDay? pickedTime = await showTimePicker(
-                            context: context,
-                            initialTime: initialTime,
-                            builder: (context, child) {
-                              return Theme(
-                                data: Theme.of(context).copyWith(
-                                  timePickerTheme: TimePickerThemeData(
-                                    // Clock ka background
-                                    dialBackgroundColor: Colors.grey[200],
-                                    // Ghadi ki sui ka color (Hand)
-                                    dialHandColor: EColors.accentPrimary,
+                        SettingTile(
+                          icon: Icons.alarm_sharp,
+                          iconColor: Colors.deepOrange.shade400,
+                          backgroundColor: Colors.deepOrange.shade50,
+                          onTap: () async {
+                            final TimeOfDay initialTime =
+                                await profileController.getNotificationTime();
+                            final TimeOfDay? pickedTime = await showTimePicker(
+                              context: context,
+                              initialTime: initialTime,
+                              builder: (context, child) {
+                                return Theme(
+                                  data: Theme.of(context).copyWith(
+                                    timePickerTheme: TimePickerThemeData(
+                                      // Clock ka background
+                                      dialBackgroundColor: Colors.grey[200],
+                                      // Ghadi ki sui ka color (Hand)
+                                      dialHandColor: EColors.accentPrimary,
 
-                                    // AM/PM button colors
-                                    // dayPeriodTextColor: Colors.green,
-                                    hourMinuteTextColor: EColors.accentPrimary,
+                                      // AM/PM button colors
+                                      // dayPeriodTextColor: Colors.green,
+                                      hourMinuteTextColor:
+                                          EColors.accentPrimary,
 
-                                    dayPeriodColor: EColors.accentPrimary,
+                                      dayPeriodColor: EColors.accentPrimary,
+                                    ),
                                   ),
+                                  child: child!,
+                                );
+                              },
+                            );
+                            if (pickedTime == null) return;
+                            await profileController.setNotificationTime(
+                              pickedTime,
+                            );
+                          },
+
+                          title: "Time",
+                          subTitle: 'Select notification time ',
+                          suffixWidget: Consumer(
+                            builder: (_, ref, __) {
+                              final time = ref.watch(
+                                profileStateProvider.select(
+                                  (s) => s.notificationTime,
                                 ),
-                                child: child!,
+                              );
+                              return Text(
+                                time.format(context),
+                                style: Theme.of(context).textTheme.titleMedium!
+                                    .apply(color: EColors.accentPrimary),
                               );
                             },
-                          );
-                          if (pickedTime == null) return;
-                          await profileController.setNotificationTime(pickedTime);
-                        },
-
-                        title: "Time",
-                        subTitle: 'Select notification time ',
-                        suffixWidget: Consumer(
-                          builder: (_, ref, __) {
-                            final time = ref.watch(
-                              profileStateProvider.select(
-                                    (s) => s.notificationTime,
-                              ),
-                            );
-                            return Text(
-                              time.format(context),
-                              style: Theme.of(context).textTheme.titleMedium!.apply(
-                                color: EColors.accentPrimary,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                        child: Divider(height: 1, color: Colors.grey[300]),
-                      ),
-                      Consumer(
-                        builder: (_, ref, __) {
-                          final autoSync = ref.watch(
-                            profileStateProvider.select((S) => S.autoSync),
-                          );
-                          return SettingTile(
-                            icon: Icons.sync_lock,
-                            iconColor: Colors.yellowAccent.shade400,
-                            backgroundColor: Colors.yellowAccent.shade100,
-                            title: "Auto sync",
-                            subTitle: 'auto sync the items',
-                            suffixWidget: CupertinoSwitch(
-                              value: autoSync,
-                              activeTrackColor: EColors.accentPrimary,
-                              onChanged: (v) async {
-                                await ref
-                                    .read(profileStateProvider.notifier)
-                                    .changeAutoSync(v);
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                        child: Divider(height: 1, color: Colors.grey[300]),
-                      ),
-                      SettingTile(
-                        icon: Icons.sync,
-                        iconColor: Colors.green.shade400,
-                        backgroundColor: Colors.green.shade100,
-                        title: "Manual Sync",
-                        subTitle: 'sync products manual  ',
-                        suffixWidget: TextButton(
-                          onPressed: () async {
-                            await profileController.manualSync();
-                          },
-                          child: Text(
-                            "sync now",
-                            style: Theme.of(context).textTheme.labelLarge!.apply(
-                                color:Colors.grey.shade700
-                            ),
                           ),
                         ),
-                      ),
-                    ],),
-                  ),
-
-                  const  SizedBox(height: 32),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                          vertical: 4,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Divider(height: 1, color: Colors.grey[300]),
                         ),
-                        child: ElevatedButton(
-                          onPressed: (){_loginButtonHelper(ref, context);},
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                        ExpansionTile(
+                          tilePadding: const EdgeInsets.symmetric(
+                            horizontal: 0,
+                          ),
+                          iconColor: Colors.grey,
+                          collapsedIconColor: EColors.primaryDark,
+                          shape: const Border(),
+                          collapsedShape: const Border(),
+                          childrenPadding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 8,
+                          ),
+                          title: Row(
                             children: [
-                              const Icon(Icons.exit_to_app_sharp,color: Colors.white,size: 20,),
-                              const SizedBox(width: 8,),
-                              Text(loginText),
+                              CircleAvatar(
+                                backgroundColor: Colors.purple.shade50,
+                                child: Icon(
+                                  Icons.notifications_active,
+                                  color: EColors.primary,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Send notification before',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.labelMedium,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      'select days before alerts expiry',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.labelLarge,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 0.0,
+                              ),
+                              child: Consumer(
+                                builder: (_, ref, _) {
+                                  final selectedDays = ref.watch(
+                                    profileStateProvider.select(
+                                      (s) => s.selectedDays,
+                                    ),
+                                  );
+
+                                  return NotificationDayChips(
+                                    selectedDays: selectedDays,
+                                    onSelectedChanged: (newList) {
+                                      ref
+                                          .read(profileStateProvider.notifier)
+                                          .setNotificationDays(newList);
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
                         ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Divider(height: 1, color: Colors.grey[300]),
+                        ),
+                        Consumer(
+                          builder: (_, ref, __) {
+                            final autoSync = ref.watch(
+                              profileStateProvider.select((S) => S.autoSync),
+                            );
+                            return SettingTile(
+                              icon: Icons.sync_lock,
+                              iconColor: Colors.yellowAccent.shade700,
+                              backgroundColor: Colors.yellow.shade50,
+                              title: "Auto sync",
+                              subTitle: 'auto sync the items',
+                              suffixWidget: CupertinoSwitch(
+                                value: autoSync,
+                                activeTrackColor: EColors.accentPrimary,
+                                onChanged: (v) async {
+                                  await ref
+                                      .read(profileStateProvider.notifier)
+                                      .changeAutoSync(v);
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Divider(height: 1, color: Colors.grey[300]),
+                        ),
+                        Consumer(
+                          builder: (_, ref, _) {
+                            final isSyncing = ref.watch(isItemsSyncingProvider);
+                            return SettingTile(
+                              icon: Icons.sync,
+                              iconColor: Colors.green.shade400,
+                              backgroundColor: Colors.green.shade50,
+                              title: "Manual Sync",
+                              subTitle: 'sync products manual  ',
+                              suffixWidget: TextButton(
+                                onPressed: () async {
+                                  final isLoading = ref.read(
+                                    isItemsSyncingProvider,
+                                  );
+                                  if (isLoading) return;
+
+                                  ref
+                                          .read(isItemsSyncingProvider.notifier)
+                                          .state =
+                                      true;
+                                  try {
+                                    await profileController.manualSync();
+                                  } catch (e) {
+                                    SnackBarService.showMessage(
+                                      'something went wrong',
+                                    );
+                                  } finally {
+                                    ref
+                                            .read(
+                                              isItemsSyncingProvider.notifier,
+                                            )
+                                            .state =
+                                        false;
+                                  }
+                                },
+                                child: !isSyncing
+                                    ? Text(
+                                        "sync now",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium!
+                                            .apply(color: Colors.grey.shade700),
+                                      )
+                                    : SpinKitRing(
+                                        color: EColors.primaryDark,
+                                        size: 30,
+                                        lineWidth: 3,
+                                      ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 32),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 4,
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _loginButtonHelper(ref, context);
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.exit_to_app_sharp,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(loginText),
+                        ],
                       ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -423,11 +603,39 @@ class ProfileScreen extends ConsumerWidget {
                 onPressed: () {
                   showDialog(
                     context: context,
-                    builder: (_) =>const  AlertBoxDeleteUser(),
+                    builder: (_) => AlertBoxDeleteUser(
+                      "Delete Account?",
+                      () async {
+                        FullScreenLoader.showLoader(
+                          context,
+                          'Deleting all spaces & items...',
+                        );
+                        try {
+                          final controller = ref.read(
+                            profileStateProvider.notifier,
+                          );
+                          await controller.deleteUser();
+                          if (context.mounted) {
+                            FullScreenLoader.stopLoader(context);
+                            context.pop();
+                          }
+                          ref.read(screenRedirectProvider).screenRedirect();
+                        } catch (e) {
+                          if (context.mounted) {
+                            FullScreenLoader.stopLoader(context);
+                            context.pop();
+                          }
+
+                          SnackBarService.showError(
+                            'Delete user failed.please try again later! $e',
+                          );
+                        }
+                      },
+                      'This action cannot be undone.All the data associated with the user will be deleted permanently.',
+                    ),
                   );
                 },
                 child: Text(
-
                   "Delete Account",
                   style: Theme.of(
                     context,
@@ -442,29 +650,28 @@ class ProfileScreen extends ConsumerWidget {
   }
 }
 
-_loginButtonHelper(WidgetRef ref,context) async {
-    final currentUser = ref.read(currentUserProvider).value;
-    if (currentUser == null || currentUser.id.isEmpty) {
-      SnackBarService.showError('user not found!');
-      return;
-    }
-    if (currentUser.userType == 'google') {
-  try{
+_loginButtonHelper(WidgetRef ref, context) async {
+  final currentUser = ref.read(currentUserProvider).value;
+  if (currentUser == null || currentUser.id.isEmpty) {
+    SnackBarService.showError('user not found!');
+    return;
+  }
+  if (currentUser.userType == 'google') {
+    try {
       FullScreenLoader.showLoader(context, 'you logging out.please wait!');
       final controller = ref.read(profileStateProvider.notifier);
       await controller.logOutUser();
-  }catch(e){
-    SnackBarService.showError('logout failed!');
-  }finally{
-    FullScreenLoader.stopLoader(context);
-  }
-    } else if (currentUser.userType == 'guest') {
-      try{
+    } catch (e) {
+      SnackBarService.showError('logout failed!');
+    } finally {
+      FullScreenLoader.stopLoader(context);
+    }
+  } else if (currentUser.userType == 'guest') {
+    try {
       final loginController = ref.read(loginStateProvider.notifier);
       await loginController.continueWithGoogle();
-    }catch(e){
-        SnackBarService.showError('login failed!');
-
-      }
+    } catch (e) {
+      SnackBarService.showError('login failed!');
+    }
   }
 }

@@ -16,6 +16,7 @@ class LoginButtons extends ConsumerWidget {
   @override
   Widget build(BuildContext context,WidgetRef ref) {
     final controller = ref.watch(loginStateProvider.notifier);
+    ref.watch(isLoginProvider.notifier);
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [

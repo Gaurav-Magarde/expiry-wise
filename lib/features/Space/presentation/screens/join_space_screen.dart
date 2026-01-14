@@ -43,7 +43,7 @@ class _JoinSpaceScreen extends ConsumerState<JoinSpaceScreen> {
                 height: 200,
                 alignment: Alignment.center,
                 width: MediaQuery.of(context).size.width * .7,
-                child: Image.asset("assets/images/img_3.png", fit: BoxFit.fill),
+                child: Image.asset("assets/images/img_3.webp", fit: BoxFit.fill),
               ),
               const SizedBox(height: 24),
               Text(

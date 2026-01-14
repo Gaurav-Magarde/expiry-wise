@@ -1,4 +1,5 @@
 
+import 'package:expiry_wise_app/core/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -8,7 +9,7 @@ class ItemUtils{
 
     final currentDate = DateUtils.dateOnly(DateTime.now());
 
-    final itemDate = DateFormat('yyyy-MM-dd').tryParse(itemDateString);
+    final itemDate = DateFormat(DateFormatPattern.dateformatPattern).tryParse(itemDateString);
     if(itemDate==null) return Colors.grey;
     final int days = itemDate.difference(currentDate).inDays;
 
@@ -16,19 +17,19 @@ class ItemUtils{
       return Colors.red.shade900; // Expired
     }
     else if (days == 0) {
-      return Colors.red.shade800; // Expiring Today (Critical)
+      return Colors.deepOrange.shade900; // Expiring Today (Critical)
     }
     else if (days <= 2) {
-      return Colors.red.shade600; // 1-2 Days (Urgent)
+      return Colors.deepOrange.shade600; // 1-2 Days (Urgent)
     }
     else if (days <= 5) {
-      return Colors.deepOrange.shade600; // 3-5 Days (Warning)
+      return Colors.orange.shade800; // 3-5 Days (Warning)
     }
     else if (days <= 10) {
-      return Colors.orange.shade800; // 6-10 Days (Attention)
+      return Colors.amber.shade800; // 6-10 Days (Attention)
     }
     else if (days <= 15) {
-      return Colors.amber.shade800; // 11-15 Days (Caution - Readable Yellow)
+      return Colors.amber.shade500; // 11-15 Days (Caution - Readable Yellow)
     }
     else if (days <= 30) {
       return Colors.lime.shade800; // 15-30 Days (Good - Dark Lime)
@@ -47,11 +48,11 @@ class ItemUtils{
 
     final currentDate = DateUtils.dateOnly(DateTime.now());
 
-    final itemDate = DateFormat('yyyy-MM-dd').tryParse(itemDateString);
+    final itemDate = DateFormat(DateFormatPattern.dateformatPattern).tryParse(itemDateString);
     if(itemDate==null) return 'no expiry found';
     final int days = currentDate.difference(itemDate).inDays;
 
-   if(days == 1){
+   if(days.abs() == 1){
       return "Expired yesterday";
 
     }else if(days<=45 && days >0){
@@ -70,7 +71,7 @@ class ItemUtils{
      if(days == 0){
       return "Expires today";
 
-    }else if(days == 1){
+    }else if(days.abs() == 1){
       return "Expiring tomorrow";
 
     }else if(days<=45){
@@ -93,7 +94,7 @@ class ItemUtils{
     if(itemDateString.length<2) return "no date found";
     final currentDate = DateUtils.dateOnly(DateTime.now());
 
-    final itemDate = DateFormat('yyyy-MM-dd').tryParse(itemDateString);
+    final itemDate = DateFormat(DateFormatPattern.dateformatPattern).tryParse(itemDateString);
     if(itemDate==null) return '';
     final int days = currentDate.difference(itemDate).inDays;
 
@@ -119,7 +120,7 @@ class ItemUtils{
   
   static double widthFactor(String date){
     final now = DateTime.now();
-    final exp = DateTime.parse(date);
+    final exp = DateFormat(DateFormatPattern.dateformatPattern).parse(date);
     if(exp.isBefore(now.subtract(Duration(days: 1)))) return 0;
     if(exp.isAfter(now.add(Duration(days: 28)))) return 0.05;
     final diff = exp.difference(now.subtract(Duration(days: 1)));
@@ -134,7 +135,7 @@ class ItemUtils{
 
     // 2. Dates Setup
     final currentDate = DateUtils.dateOnly(DateTime.now());
-    final expiryDate = DateFormat('yyyy-MM-dd').tryParse(expiryDateString);
+    final expiryDate = DateFormat(DateFormatPattern.dateformatPattern).tryParse(expiryDateString);
 
     if (expiryDate == null) {
       return const Icon(Icons.help_outline_rounded, color: Colors.grey);
@@ -162,7 +163,7 @@ class ItemUtils{
 
     final currentDate = DateUtils.dateOnly(DateTime.now());
 
-    final itemDate = DateFormat('yyyy-MM-dd').tryParse(itemDateString);
+    final itemDate = DateFormat(DateFormatPattern.dateformatPattern).tryParse(itemDateString);
     // Agar date invalid hai to light grey background
     if(itemDate==null) return Colors.grey.shade200;
 

@@ -1,46 +1,69 @@
 import 'dart:io';
-
+import 'package:expiry_wise_app/features/inventory/data/models/item_model.dart';
 import 'package:expiry_wise_app/services/local_db/prefs_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../local_db/sqflite_setup.dart'; // Iske liye package add karna padega
+import '../local_db/sqflite_setup.dart';
 
+final notificationServiceProvider = Provider<LocalNotificationService>(
+      (ref) => LocalNotificationService(ref),
+);
 
-final notificationServiceProvider = Provider<LocalNotificationService>((ref)=>LocalNotificationService(ref));
 class LocalNotificationService {
   late PrefsService _prefsService;
   final Ref ref;
-   LocalNotificationService(this.ref);
+
+  LocalNotificationService(this.ref);
+
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  FlutterLocalNotificationsPlugin();
 
   Future<void> init() async {
+    // --- TIMEZONE FIX START ---
     tz.initializeTimeZones();
-    tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
+
+
+    try {
+      final location = tz.getLocation('Asia/Kolkata');
+      tz.setLocalLocation(location);
+    } catch (e) {
+      tz.setLocalLocation(tz.local);
+    }
+    // --- TIMEZONE FIX END ---
+
     const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings settings = InitializationSettings(
-      android: androidSettings,
+    AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    final DarwinInitializationSettings initializationSettingsDarwin =
+    DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
     );
+
+    final InitializationSettings settings = InitializationSettings(
+      android: androidSettings,
+      iOS: initializationSettingsDarwin,
+    );
+
     await _flutterLocalNotificationsPlugin.initialize(settings);
-    // 🔥 Yahan call karo
+
     await requestPermissions();
+
     _prefsService = ref.read(prefsServiceProvider);
+
   }
 
 
   Future<void> requestPermissions() async {
-    // 1. Notification Permission (Android 13+)
     if (await Permission.notification.isDenied) {
       await Permission.notification.request();
     }
-
-    // 2. Exact Alarm Permission (Android 12+)
-    // Note: Iske bina 'zonedSchedule' exact time par nahi bajta
     if (Platform.isAndroid) {
       if (await Permission.scheduleExactAlarm.isDenied) {
         await Permission.scheduleExactAlarm.request();
@@ -48,161 +71,183 @@ class LocalNotificationService {
     }
   }
 
-  Future<void> showTestNotificationNow() async {
-    // Schedules a notification for 5 seconds from now
-    final now = DateTime.now().add(const Duration(seconds: 5));
-
-    await scheduleNotification(
-        id: 888,
-        title: "Test Working! 🚀",
-        body: "If you see this, notifications are fixed.",
-        date: now
-    );
+  int _generateNotificationId(String itemId, int daysBefore) {
+    return "${itemId}_$daysBefore".hashCode.abs();
   }
 
-  Future<void> showImmediateNotification() async {
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'expiry_channel_v3', // 🔥 NEW Channel ID (Important)
-      'Immediate Test',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-
-    const NotificationDetails details = NotificationDetails(android: androidDetails);
-
-    await _flutterLocalNotificationsPlugin.show(
-      777,
-      'Immediate Test 🔔',
-      'If you see this, permissions are OK.',
-      details,
-    );
-  }
   Future<void> scheduleNotification({
     required int id,
     required String title,
     required String body,
-    required DateTime date,
+    required dynamic date, // Accepts DateTime or TZDateTime
   }) async {
-    print("Scheduled notification ID $id for $date   , ${tz.local}");
-    if(date.isBefore(DateTime.now())) return;
-    {
-      try{
 
-        // if (Platform.isAndroid) {
-        //   // Check karo ki permission hai ya nahi
-        //   if (await Permission.scheduleExactAlarm.isDenied) {
-        //     print("Permission nahi hai! User se maang rahe hain...");
-        //
-        //     // Ye user ko seedha 'Alarms & Reminders' setting me bhej dega
-        //     // Wahan user ko toggle ON karna padega manually
-        //     await Permission.scheduleExactAlarm.request();
-        //
-        //     // Note: User wapas aake jab tak ON nahi karega, crash ho sakta hai.
-        //     // Isliye return kar do ya user ko bolo "Bhai permission de do"
-        //     return;
-        //   }
-        // }
-        await _flutterLocalNotificationsPlugin.zonedSchedule(
-          id,
-          title,
-          body,
-          payload: '${date.toString()}  | ${tz.local}',
-          tz.TZDateTime.from(date, tz.local),
-          NotificationDetails(
-              android: AndroidNotificationDetails(
-                'expiry_channel_2',
-                'Expiry Reminders',
-                channelDescription: 'Notification for expiry',
-                importance: Importance.max,
-                priority: Priority.high,
-              ),
-              iOS: DarwinNotificationDetails()
+    tz.TZDateTime tzDate;
+    if (date is DateTime) {
+      tzDate = tz.TZDateTime.from(date, tz.local);
+    } else {
+      tzDate = date;
+    }
+
+    // 2. Past Check
+    if (tzDate.isBefore(tz.TZDateTime.now(tz.local))) {
+      return;
+    }
+
+
+    try {
+      await _flutterLocalNotificationsPlugin.zonedSchedule(
+        id,
+        title,
+        body,
+        tzDate,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'expiry_channel_ALARM_V1', //
+            'Alarm Notifications',
+            importance: Importance.max,
+            priority: Priority.high,
+            color: Color(0xFF673AB7),
+            playSound: true,
+
+
+            fullScreenIntent: true,
           ),
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          iOS: DarwinNotificationDetails(),
+        ),
 
-          
-        );
-        await checkPendingNotifications();
-      }catch(e){
-        print("error is $e");
-    }
-    }
-    print("Scheduled notification ID $id for $date confirmed");
+        androidScheduleMode: AndroidScheduleMode.alarmClock,
 
-    
+        uiLocalNotificationDateInterpretation:
+        UILocalNotificationDateInterpretation.absoluteTime,
+        payload: 'Payload',
+      );
+    } catch (e) {
+    }
   }
 
-
-  Future<void> reScheduleAllNotification() async {
+  Future<void> scheduleNotificationFor(ItemModel item) async{
     try{
+      if(item.finished==1) return;
+
+      for(final days in _prefsService.allDaysNotify){
+       await cancelNotification(itemId: item.id, days: days);
+      }
+      for(final days in item.notifyConfig){
+        int id = _generateNotificationId(item.id, days);
+
+        final expiry = DateTime.tryParse(item.expiryDate??'');
+        if(expiry==null) continue;
+        final time = await _prefsService.getNotificationTime();
+
+        final triggerDate = expiry.subtract(Duration(days: days));
+
+        // Construct using DateTime first
+        final scheduledDateTime = DateTime(
+          triggerDate.year,
+          triggerDate.month,
+          triggerDate.day,
+          time.hour,
+          time.minute,
+        );
+
+        // Convert to TZ immediately
+        final tzScheduledDate = tz.TZDateTime.from(scheduledDateTime, tz.local);
+
+        await scheduleNotification(id: id, title: days == 1?"Expiring Today: ${item.name}":days == 1
+            ? "Expiring Tomorrow: ${item.name}"
+            : "${item.name} expires in $days days", body: 'Check your pantry.', date: tzScheduledDate);
+
+      }
+    }catch(e){
+
+    }
+  }
+  Future<void> cancelNotificationFor(ItemModel item) async{
+    try{
+      for(final days in _prefsService.allDaysNotify){
+       await cancelNotification(itemId: item.id, days: days);
+      }
+    }catch(e){
+
+    }
+  }
+  Future<void> cancelAllNotification() async{
+    try{
+      await _flutterLocalNotificationsPlugin.cancelAll();
+    }catch(e){
+
+    }
+  }
+  Future<void> reScheduleAllNotification() async {
+    try {
+      final isNotify = await _prefsService.getIsNotificationOn();
+      if(!isNotify) return;
       final items = await ref.read(sqfLiteSetupProvider).fetchAllItems();
-      final time =  await _prefsService.getNotificationTime();
+      final time = await _prefsService.getNotificationTime();
 
-      List<NotificationCandidate> candidates = [];
+      final now = tz.TZDateTime.now(tz.local);
 
-      final now = DateTime.now();
+      for (var item in items) {
+        if(item.finished==1) continue;
+        DateTime expiryDate;
+        try {
+          expiryDate = DateTime.parse(item.expiryDate??'');
+        } catch (e) { continue; }
 
-      for(var item in items) {
-        final expiryDate = DateTime.parse(item.expiryDate);
+        for (int days in item.notifyConfig) {
+          final triggerDate = expiryDate.subtract(Duration(days: days));
 
-        for (int days in [15,7, 3, 1]) {
-          final date = expiryDate.subtract(Duration(days: days));
+          // Construct using DateTime first
+          final scheduledDateTime = DateTime(
+            triggerDate.year,
+            triggerDate.month,
+            triggerDate.day,
+            time.hour,
+            time.minute,
+          );
 
-       final scheduledDate =  DateTime(date.year,date.month,date.day,time.hour,time.minute);
-          if (scheduledDate.isAfter(now)) {
-            candidates.add(NotificationCandidate(
-              id: int.tryParse(item.id) ?? item.hashCode,
-              daysBefore: days,
-              scheduledDate: scheduledDate,
-              itemName: item.name,
-            ));
+          // Convert to TZ immediately
+          final tzScheduledDate = tz.TZDateTime.from(scheduledDateTime, tz.local);
+
+          if (tzScheduledDate.isAfter(now)) {
+            await scheduleNotification(
+              id: _generateNotificationId(item.id, days),
+              title: days == 1
+                  ? "Expiring Tomorrow: ${item.name}"
+                  : "${item.name} expires in $days days",
+              body: "Check your pantry.",
+              date: tzScheduledDate,
+            );
           }
         }
-      } candidates.sort((a,b)=>a.scheduledDate.compareTo(b.scheduledDate));
+      }
+      await checkPendingNotifications();
+    } catch (e) {
 
-          int limit = candidates.length > 50 ? 50 : candidates.length;
-          final topCandidates = candidates.take(limit);
-          print("Scheduled notification length = ");
-
-      _flutterLocalNotificationsPlugin.cancelAll();
-          for(var candidate in topCandidates){
-            print("${candidate.itemName}   ${candidate.scheduledDate}  ${candidate.daysBefore}");
-            int notifId = (candidate.id) + candidate.daysBefore;
-            String title = candidate.daysBefore == 1
-                ? "Urgent: Expiring Tomorrow! 🚨"
-                : "Expiring in ${candidate.daysBefore} days ⏳";
-           await scheduleNotification(id :notifId,title: title,body: "${candidate.itemName} is Expiring",date: candidate.scheduledDate);
-
-          }
-
-
-
-    }catch(e){
-      throw "  ";
     }
   }
 
-  Future<void> cancelNotification({required int id})async{
-    _flutterLocalNotificationsPlugin.cancel(id);
+  Future<void> cancelNotification({required String itemId, required int days}) async {
+    int id = _generateNotificationId(itemId, days);
+    await _flutterLocalNotificationsPlugin.cancel(id);
   }
-Future<void> checkPendingNotifications() async {
-  final List<PendingNotificationRequest> pendingNotificationRequests =
-  await _flutterLocalNotificationsPlugin.pendingNotificationRequests();
 
-  print('Total pending notifications: ${pendingNotificationRequests.length}');
-
-  for (var notification in pendingNotificationRequests) {
-    print('ID: ${notification.id}, Title: ${notification.title}, Body: ${notification.body}, Payload: ${notification.payload}, } ');
+  Future<void> checkPendingNotifications() async {
+    final pending = await _flutterLocalNotificationsPlugin.pendingNotificationRequests();
   }
 }
-}
 
-class NotificationCandidate{
+class NotificationCandidate {
   final int id;
   final String itemName;
   final DateTime scheduledDate;
   final int daysBefore;
 
-  NotificationCandidate({required this.id, required this.itemName, required this.scheduledDate, required this.daysBefore,});
+  NotificationCandidate({
+    required this.id,
+    required this.itemName,
+    required this.scheduledDate,
+    required this.daysBefore,
+  });
 }
-

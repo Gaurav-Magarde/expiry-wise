@@ -38,12 +38,13 @@ class MemberController extends AsyncNotifier<MemberState> {
       final currentState = state.value;
       if (currentState == null) return;
       final isInternet = ref.read(isInternetConnectedProvider);
+      final currentMember = ref.read(currentSpaceProfileProvider);
       final user = ref.read(currentUserProvider).value;
       if (user == null || user.id.isEmpty) {
         SnackBarService.showError('user not found');
         return;
       }
-      if (member.role == MemberRole.member.name && member.userId != user.id) {
+      if (currentMember == MemberRole.member && member.userId != user.id) {
         SnackBarService.showMessage('Only Admin can manage members');
         return;
       }
@@ -74,12 +75,14 @@ class MemberController extends AsyncNotifier<MemberState> {
       final currentState = state.value;
       if (currentState == null) return;
       final isInternet = ref.read(isInternetConnectedProvider);
+      final currentMember = ref.read(currentSpaceProfileProvider);
+
       final user = ref.read(currentUserProvider).value;
       if (user == null || user.id.isEmpty) {
         SnackBarService.showError('user not found');
         return;
       }
-      if (member.role == MemberRole.member.name) {
+      if (currentMember.name == MemberRole.member.name) {
         SnackBarService.showMessage('Only Admin can manage members');
         return;
       }
@@ -90,6 +93,8 @@ class MemberController extends AsyncNotifier<MemberState> {
       );
 
       ref.invalidateSelf();
+      ref.invalidate(currentSpaceProvider);
+      ref.invalidate(currentSpaceProfileProvider);
     } catch (e) {
       SnackBarService.showError('change role of ${member.name} failed $e');
     }

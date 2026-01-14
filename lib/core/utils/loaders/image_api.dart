@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:expiry_wise_app/features/inventory/presentation/controllers/item_controller.dart';
+import 'package:expiry_wise_app/features/inventory/presentation/controllers/item_controller/item_controller.dart';
 import 'package:expiry_wise_app/features/inventory/data/models/item_model.dart';
 import 'package:expiry_wise_app/core/constants/ApiKeys.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -55,7 +55,7 @@ class ImageService {
 
 
   Future<void> startSmartSync() async {
-    final itemStream = await _ref.read(itemsStreamProvider.future);
+    final itemStream = _ref.read(itemsStreamProvider).value ?? [];
     for (ItemModel item in itemStream) {
 
       if (item.image.isNotEmpty && File(item.image).existsSync()) {

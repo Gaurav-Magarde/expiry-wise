@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expiry_wise_app/features/expenses/data/models/expense_model.dart';
 import 'package:expiry_wise_app/services/local_db/sqflite_setup.dart';
 import 'package:expiry_wise_app/features/Member/data/models/member_model.dart';
 import 'package:expiry_wise_app/features/Space/data/model/space_model.dart';
@@ -37,7 +38,7 @@ class FireStoreService {
     ItemModel item,
   ) async {
     try {
-      if (item.expiryDate.isEmpty ||
+      if (
           item.name.isEmpty ||
           item.category.isEmpty ||
           item.spaceId ==null ||
@@ -55,7 +56,7 @@ class FireStoreService {
           .doc(spaceId)
           .collection("items")
           .doc(item.id)
-          .set(itemInMap);
+          .set(itemInMap,SetOptions(merge: true));
 
       await _sqfLiteSetup.markItemAsSynced(item.id);
 
@@ -77,33 +78,33 @@ class FireStoreService {
 
   Future<List<ItemModel>> fetchAllItemsFirebase(String userId,String spaceId) async {
     try {
-      final spaceRef = instance
+      print('$spaceId');
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection("spaces")
-          .doc(spaceId);
-      DocumentSnapshot doc = await spaceRef.get();
-
-      if(doc.exists){
-        final snapshot = await spaceRef.collection("items")
+          .doc(spaceId).collection("items")
             .get();
 
-
+      print('A');
         List<ItemModel> list = [];
+      print('C');
         for(final s in snapshot.docs){
-              final map = s.data() as Map<String, dynamic>;
+      print('L');
+              final map = s.data() as Map<String,dynamic>;
 
               if(map.isEmpty) continue;
               map['user_id'] = userId;
               map['is_synced'] = 1;
 
               map['image'] = '';
-
+print('object');
               list.add(ItemModel.fromMap(item: map));
+      print('K');
 
             }
+      print('Z');
         return list;
-      }
-      return [];
-    } on FirebaseAuthException catch (e){
+
+    }on FirebaseAuthException catch (e){
       throw TFirebaseAuthException(e.code);
     } on PlatformException catch (e){
       throw TPlatformException(e.code);
@@ -114,7 +115,7 @@ class FireStoreService {
     }on Exception {
       throw TExceptions().message;
     }catch (e){
-      throw 'some went wrong';
+      throw 'some went wrong $e';
     }
   }
 
@@ -125,6 +126,7 @@ class FireStoreService {
       if(doc.exists){
         await docRef.delete();
       }
+
     } on FirebaseAuthException catch (e){
       throw TFirebaseAuthException(e.code);
     } on PlatformException catch (e){
@@ -140,20 +142,16 @@ class FireStoreService {
     }
   }
 
-
-  Future<void> updateItemFromFirebase({required Map<String,dynamic> map,required String id}) async {
+  Future<void> deleteAllItemFromSpace({required String spaceId}) async {
     try{
-      final docRef = instance.collection("spaces").doc(map['space_id']??'').collection("items").doc(id);
-      final doc =  await docRef.get();
-      if(doc.exists){
-        map['is_synced'] = 1;
-        map['image'] = '';
+      final docRef = await instance.collection("spaces").doc(spaceId).collection("items");
+      final docs =  await docRef.get();
+      WriteBatch batch = FirebaseFirestore.instance.batch();
 
-        map['updated_at'] = DateTime.now().toString();
-
-        await docRef.update(map);
+      for(final doc in docs.docs){
+        batch.delete(doc.reference);
       }
-      await _sqfLiteSetup.markItemAsSynced(id);
+      batch.commit();
 
     } on FirebaseAuthException catch (e){
       throw TFirebaseAuthException(e.code);
@@ -169,6 +167,9 @@ class FireStoreService {
       throw 'some went wrong';
     }
   }
+
+
+
 
 
   // -------------------------------------[Space Firebase] ----------------------------------
@@ -219,11 +220,12 @@ class FireStoreService {
 
         if(members.isNotEmpty){
           for(var member in members){
+            await deleteAllItemFromSpace(spaceId: spaceId);
             await removeSpaceFromUser(spaceId: spaceId, id: member['user_id']);
           }
         }
 
-        final res = await docRef.delete();
+        await docRef.delete();
       }
     } on FirebaseAuthException catch (e){
       throw TFirebaseAuthException(e.code);
@@ -299,25 +301,15 @@ class FireStoreService {
   }
   // ----------------------------------------[user Firebase] ----------------------------
 
-  Future<void> insertUserTOFirebase(UserModel user) async {
+  Future<void> saveUserTOFirebase(UserModel user) async {
     try {
       final userToMap = user.toMap();
-      final docRef = await instance
-          .collection('users')
-          .doc(user.id);
-      final doc = await docRef.get();
-      if(doc.exists) {
         userToMap['is_synced'] = 1;
         userToMap['updated_at'] = DateTime.now().toString();
-
-        updateUserFromFirebase(map: userToMap, id: user.id);
-
-      }
-    else{
-        userToMap['is_synced'] = 1;
-
-        docRef.set(userToMap);
-      }
+      await instance
+          .collection('users')
+          .doc(user.id)
+          .set(userToMap, SetOptions(merge: true));
     } on FirebaseAuthException catch (e){
       throw TFirebaseAuthException(e.code);
     } on PlatformException catch (e){
@@ -415,7 +407,8 @@ class FireStoreService {
       await instance
           .collection('users')
           .doc(user.id)
-          .set(userToMap);
+          .set(userToMap,
+          SetOptions(merge: true));
 
       await _sqfLiteSetup.markUserAsSynced(user.id);
 
@@ -449,16 +442,13 @@ class FireStoreService {
         List list = data['spaces'] ?? [];
 
         List<SpaceModel> spaces = [];
-        print('%% => $list');
 
         for(final spaceId in list){
 
           final space = await spaceDetailById(id: spaceId,userId:id);
 
           if(space!=null) spaces.add(space);
-          print(spaces);
         }
-        print('#');
         return spaces;
       }
       return [];
@@ -477,30 +467,7 @@ class FireStoreService {
     }
   }
 
-  Future<void> updateUserFromFirebase({required Map<String,dynamic> map,required String id}) async {
-    try{
-      final docRef = await instance.collection("users").doc(id);
-      final doc =  await docRef.get();
-      if(doc.exists){
-        map['is_synced'] = 1;
-        map['updated_at'] = DateTime.now().toString();
 
-        await docRef.update(map);
-      }
-    } on FirebaseAuthException catch (e){
-      throw TFirebaseAuthException(e.code);
-    } on PlatformException catch (e){
-      throw TPlatformException(e.code);
-    } on FormatException catch (e){
-      throw TFormatException(e.message);
-    } on FirebaseException catch (e){
-      throw TFirebaseException(e.code);
-    }on Exception {
-      throw TExceptions().message;
-    }catch (e){
-      throw 'some went wrong';
-    }
-  }
   Future<void> removeSpaceFromUser({required String spaceId,required String id}) async {
     try{
       final docRef = await instance.collection("users").doc(id);
@@ -590,7 +557,7 @@ class FireStoreService {
         memberMap['is_synced'] = 1;
         list.add(memberMap);
 
-        Map<String, dynamic> spaceMap = {'member': list,'update_at':time};
+        Map<String, dynamic> spaceMap = {'member': list,'updated_at':time};
         await instance.collection('spaces').doc(spaceId).update(spaceMap);
 
 
@@ -634,12 +601,12 @@ class FireStoreService {
     }
   }
 
-  Future<List> fetchMembersFromSpace(String? userId, {spaceId})async {
+  Future<List<MemberModel>> fetchMembersFromSpace({required spaceId})async {
     try{
      final docRef =  await instance.collection('spaces').doc(spaceId);
      final doc = await docRef.get();
 
-     final memberList = [];
+     List<MemberModel> memberList = [];
      if(doc.exists){
        final data = doc.data() as Map<String,dynamic>;
        final list  = data['member']??[];
@@ -665,7 +632,45 @@ class FireStoreService {
       throw 'some went wrong';
     }
   }
+  Future<MemberModel?> fetchSingleMemberFromSpace({required String spaceId, required String userId}) async {
+    try {
+      // 1. Get Document Reference
+      final docRef = instance.collection('spaces').doc(spaceId);
+      final doc = await docRef.get();
 
+      if (doc.exists) {
+        final data = doc.data() as Map<String, dynamic>;
+
+        // 2. Get the list (Safety check included)
+        final list = data['member'] as List<dynamic>? ?? [];
+
+        // 3. Find the specific member inside the list
+        for (var member in list) {
+          if (member['user_id'] == userId) {
+
+            member['is_synced'] = 1;
+
+            return MemberModel.fromLocal(member);
+          }
+        }
+      }
+
+      return null;
+
+    } on FirebaseAuthException catch (e) {
+      throw TFirebaseAuthException(e.code);
+    } on PlatformException catch (e) {
+      throw TPlatformException(e.code);
+    } on FormatException catch (e) {
+      throw TFormatException(e.message);
+    } on FirebaseException catch (e) {
+      throw TFirebaseException(e.code);
+    } on Exception {
+      throw TExceptions().message;
+    } catch (e) {
+      throw 'something went wrong';
+    }
+  }
 
   Future<void> removeMemberFromSpace(MemberModel member) async {
     try{
@@ -680,7 +685,10 @@ class FireStoreService {
           newMembers.add(mem);
         }
         await docRef.update({'member':newMembers,'updated_at':DateTime.now().toString()});
-        if(newMembers.isEmpty) await docRef.delete();
+        if(newMembers.isEmpty) {
+          await deleteAllItemFromSpace(spaceId: member.spaceID);
+          await docRef.delete();
+        }
       }
         await removeSpaceFromUser(spaceId: member.spaceID, id: member.userId);
 
@@ -698,7 +706,7 @@ class FireStoreService {
       throw 'some went wrong';
     }
   }
-  Future<void> changeMemberRole(MemberModel member,String newRole) async {
+  Future<int> changeMemberRole(MemberModel member,String newRole) async {
     try{
 
       final docRef =  await instance.collection('spaces').doc(member.spaceID);
@@ -706,14 +714,27 @@ class FireStoreService {
       if(doc.exists){
         final data = doc.data() as Map<String,dynamic>;
         List list  = data['member'] ?? [];
+        bool isAnyAdmin = false;
+        if(newRole==MemberRole.member.name){
+          for (final mem in list) {
+            if (mem['user_id'] != member.userId &&
+                mem['role'] == MemberRole.admin.name) {
+              isAnyAdmin = true;
+              break;
+            }
+          }
+        if(!isAnyAdmin) return 0;
+        }
         for(final mem in list){
           if(mem['user_id']==member.userId){
             mem['role'] = newRole;
+            break;
           }
         }
         await docRef.update({'member' : list,'updated_at':DateTime.now().toString()});
+        return 1;
       }
-
+      return 2;
     } on FirebaseAuthException catch (e){
       throw TFirebaseAuthException(e.code);
     } on PlatformException catch (e){
@@ -754,4 +775,31 @@ class FireStoreService {
       throw 'something went wrong';
     }
   }
+
+  /// --------------------------------------------[EXPENSE SECTION]----------------------------------------------
+
+Future<void> saveExpense({required ExpenseModel expense}) async{
+    await FirebaseFirestore.instance.collection('spaces').doc(expense.spaceId).collection('expense').doc(expense.id).set(expense.toMap(),SetOptions(merge: true));
 }
+
+Future<void> deleteExpense({required ExpenseModel expense}) async{
+    await FirebaseFirestore.instance.collection('spaces').doc(expense.spaceId).collection('expense').doc(expense.id).delete();
+}
+
+Future<List<ExpenseModel>> getExpenses({required String spaceId}) async{
+    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('spaces').doc(spaceId).collection('expense').get();
+
+    List<ExpenseModel> expenseList = [];
+    for(final doc in snapshot.docs){
+        final expense = ExpenseModel.fromMap(map: doc.data() as Map<String,dynamic>);
+        expenseList.add(expense);
+    }
+    return expenseList;
+
+  }
+
+
+
+}
+
+

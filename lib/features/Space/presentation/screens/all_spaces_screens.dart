@@ -8,31 +8,14 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/widgets/shimmers/space_shimmer.dart';
 import '../../../../core/theme/colors.dart';
 import '../../../../core/widgets/text_form_field.dart';
-class AllSpacesScreens extends ConsumerStatefulWidget {
-  AllSpacesScreens({super.key});
+import '../widgets/AddSpaceButton.dart';
+class AllSpacesScreens extends ConsumerWidget {
+  const AllSpacesScreens({super.key});
 
-  final TextEditingController _controller = TextEditingController();
-  @override
-  ConsumerState<ConsumerStatefulWidget> createState() {
-    return _AllSpacesScreens();
-  }
-
-}
-
-
-
-class _AllSpacesScreens extends ConsumerState<AllSpacesScreens> {
-  _AllSpacesScreens();
 
 
   @override
-  void dispose() {
-    super.dispose();
-    widget._controller.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context,ref) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -58,7 +41,7 @@ class _AllSpacesScreens extends ConsumerState<AllSpacesScreens> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image.asset('assets/images/img_5.png'),
+                        Image.asset('assets/images/img_5.webp'),
                         const SizedBox(height: 16),
                         Text(
                           "No space Found!",style: Theme.of(context).textTheme.titleLarge!.apply(color: EColors.primaryDark,fontWeightDelta: 3),
@@ -93,87 +76,7 @@ class _AllSpacesScreens extends ConsumerState<AllSpacesScreens> {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: EColors.primary,
-        child: const Icon(Icons.add, color: Colors.white),
-        onPressed: () {
-
-          showDialog(
-            context: context,
-            builder: (c) {
-              return AlertDialog(
-                elevation: 1,
-                title: Text("Add New Space",style: Theme.of(context).textTheme.titleMedium!.apply(color: EColors.accentPrimary),),
-                content: TextFormFieldWidget(
-                  labelText: 'Space Name',
-                  controller: widget._controller,
-                  onChanged: (v) {
-                    ref.read(spaceNameProvider.notifier).state = v;
-                  },
-                  prefixIcon: const Icon(Icons.store_mall_directory_sharp),
-                  hint: "eg. Home Space",
-                ),
-                actions: [
-                  SizedBox(
-                    width: 400,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Consumer(
-                            builder: (_, ref, __) {
-                              final control = ref.read(addNewSpaceLoadingProvider.notifier);
-                              final isLoading = ref.watch(
-                                addNewSpaceLoadingProvider,
-                              );
-                              return ElevatedButton(
-                                onPressed: () async {
-                                  control.state = true;
-                                  final isSpaceCreating = ref.read(
-                                    isSpaceCreatingProvider,
-                                  );
-                                  if (isSpaceCreating) return;
-                                  try{
-                                    final spaceController = ref.read(
-                                      isSpaceCreatingProvider.notifier,
-                                    );
-                                    spaceController.state = true;
-                                    final controller = ref.read(
-                                      spaceControllerProvider.notifier,
-                                    );
-                                    final isDone = await controller.addNewSpace();
-                                    if(!isDone) return;
-                                    if (context.mounted) {
-                                      context.pop();
-                                    }
-                                  }catch(e){
-                                    SnackBarService.showError('something went wrong');
-                                  }finally{
-                                    final spaceController = ref.read(
-                                      isSpaceCreatingProvider.notifier,
-                                    );
-
-                                    spaceController.state = false;
-                                    control.state = false;                                  }
-                                },
-                                child: isLoading
-                                    ? CircularProgressIndicator(
-                                        color: Colors.white,
-                                      )
-                                    :const  Text("create"),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            },
-          );
-
-        },
-      ),
+      floatingActionButton: AddSpaceFloatingButton(),
     );
   }
 }

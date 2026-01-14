@@ -20,7 +20,7 @@ class ItemCardShimmer extends ConsumerWidget{
         width: 300,
         decoration: BoxDecoration(
             color:  Colors.grey[200],
-            border: Border.all(width: 2, color:  Colors.grey[400]!),
+            border: Border.all(width: 1, color:  Colors.grey[400]!),
             borderRadius: BorderRadius.circular(16),
             // border: Border.all(width: 1,),
             boxShadow: [
@@ -40,8 +40,8 @@ class ItemCardShimmer extends ConsumerWidget{
             children: [
               Row(
                 children: [
-                  Shimmer(child: CircleAvatar(radius: 30,)),
-                  SizedBox(width: 32,)
+                  Shimmer(child: CircleAvatar(radius: 30,backgroundColor: Colors.grey.shade300,)),
+                  const SizedBox(width: 32,)
                   ,Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -50,15 +50,15 @@ class ItemCardShimmer extends ConsumerWidget{
                       Shimmer(child:Container(color: Colors.grey[300],width: 48,height: 10,)),
                     ],
                   ),
-                  Spacer(),
+                  const Spacer(),
                   Shimmer(child:Container(color: Colors.grey[200],width: 64,height: 16,)),
 
                 ],
               ),
-              SizedBox(height: 16,),
+              const SizedBox(height: 16,),
               Shimmer(child:Container(color: Colors.grey[300],width: 64,height: 10,)),
 
-            SizedBox(height: 8,),
+              const SizedBox(height: 8,),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -69,7 +69,7 @@ class ItemCardShimmer extends ConsumerWidget{
 
               ],
             ),
-              SizedBox(height: 8,),
+              const SizedBox(height: 8,),
               Shimmer(child:Container(color: Colors.grey[300],width: double.infinity,height: 12,)),
 
             ],

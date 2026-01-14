@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:expiry_wise_app/features/Member/data/models/member_model.dart';
 import 'package:expiry_wise_app/features/Space/data/model/space_model.dart';
 import 'package:expiry_wise_app/features/inventory/data/models/item_model.dart';
+import 'package:expiry_wise_app/features/inventory/presentation/controllers/item_controller/item_controller.dart';
 import 'package:expiry_wise_app/services/local_db/prefs_service.dart';
 import 'package:expiry_wise_app/services/local_db/sqflite_setup.dart';
+import 'package:expiry_wise_app/services/notification_services/local_notification_service.dart';
 import 'package:expiry_wise_app/services/remote_db/fire_store_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
@@ -155,35 +157,38 @@ class CurrentUser extends AsyncNotifier<UserModel?> {
   Future<UserModel?> loadUserOnLogin(String id,String email) async {
     try {
       final isInternet = ref.read(isInternetConnectedProvider);
+      final isNotify = await _prefs.getIsNotificationOn();
       if(!isInternet) {
         SnackBarService.showMessage("Please check your internet connection");
         return null;
       }
+      print('A');
       final user = await _fireStoreService.getUserDetail(id);
+      print('A');
       if (user == null){
-        SnackBarService.showError("something went wrong!.please try again");
         return null;
       }
+
+      print('A');
       await _sqfLite.insertUser(user);
+      print('A');
 
       List<SpaceModel> spaces = await _fireStoreService.fetchSpacesFromUser(id);
+      print('A');
 
       for (var space in spaces) {
-        final isExist = await _fireStoreService.isExist(
-          collection: 'spaces',
-          doc: space.id,
-        );
+      print('a');
 
-        if (!isExist) continue;
 
         await _sqfLite.createSpace(space: space);
 
         List members = await _fireStoreService.fetchMembersFromSpace(
-          user.id,
           spaceId: space.id,
         );
+      print('b');
 
         for (MemberModel mem in members) {
+      print('B');
           final newM = MemberModel(
             role: mem.role,
             name: mem.name,
@@ -192,24 +197,29 @@ class CurrentUser extends AsyncNotifier<UserModel?> {
             userId: mem.userId,
             photo: mem.photo,
           );
+      print('#@');
           await _sqfLite.addMemberToMembers(member: newM);
-          await _sqfLite.markMemberAsSynced(newM.id);
         }
+      print('#');
 
-        List items = await _fireStoreService.fetchAllItemsFirebase(
+        List<ItemModel> items = await _fireStoreService.fetchAllItemsFirebase(
           user.id,
           space.id,
         );
+      print('C');
+          await _sqfLite.insertItems(  items);
+      print('c');
         for (ItemModel item in items) {
-          await _sqfLite.insertItem(item);
-
-          await _sqfLite.markItemAsSynced(item.id);
+      print('D');
+           if(isNotify) ref.read(notificationServiceProvider).scheduleNotificationFor(item).catchError((e){});
         }
         await _sqfLite.markSpaceAsSynced(space.id);
       }
+      print('E');
       if(state.hasValue && state.value!=null){
         await _sqfLite.changeUserIdOnTransaction(oldId:state.value!.id,newUser : user,email: email);
       }
+      print('E');
       state = AsyncData(user);
 
       return user;

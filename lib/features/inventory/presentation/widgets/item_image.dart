@@ -1,4 +1,4 @@
-import 'package:expiry_wise_app/features/inventory/presentation/controllers/add_items_controller.dart';
+import 'package:expiry_wise_app/features/inventory/presentation/controllers/add_item_controllers/add_items_controller.dart';
 import 'package:expiry_wise_app/core/utils/helpers/image_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

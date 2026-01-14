@@ -6,6 +6,7 @@ import 'package:expiry_wise_app/features/Space/data/repository/space_repository.
 import 'package:expiry_wise_app/services/local_db/prefs_service.dart';
 import 'package:expiry_wise_app/services/local_db/sqflite_setup.dart';
 import 'package:expiry_wise_app/core/utils/snackbars/snack_bar_service.dart';
+import 'package:expiry_wise_app/services/remote_db/fire_store_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -18,25 +19,27 @@ import '../../../User/presentation/controllers/user_controller.dart';
 import '../../data/model/space_model.dart';
 
 final spaceControllerProvider =
-    AsyncNotifierProvider.autoDispose<SpaceController, SpaceState>(SpaceController.new);
+    AsyncNotifierProvider.autoDispose<SpaceController, SpaceState>(
+      SpaceController.new,
+    );
 
 class SpaceController extends AsyncNotifier<SpaceState> {
   @override
   Future<SpaceState> build() async {
     final sqf = ref.read(spaceRepoProvider);
     final user = await ref.watch(currentUserProvider.future);
-    if(user==null) return SpaceState([]);
+    if (user == null) return SpaceState([]);
     final list = await sqf.fetchAllSpaces(userId: user.id);
     return SpaceState(list);
   }
 
   Future<SpaceModel?> giveDefaultSpace() async {
     final link = ref.keepAlive();
-    try{
+    try {
       final prefs = ref.read(prefsServiceProvider);
       final spaceId = await prefs.getString("current_space");
       final user = await ref.read(currentUserProvider.future);
-      if(user==null||user.id.isEmpty) return null;
+      if (user == null || user.id.isEmpty) return null;
       final sqf = ref.read(sqfLiteSetupProvider);
 
       if (spaceId != null) {
@@ -51,9 +54,9 @@ class SpaceController extends AsyncNotifier<SpaceState> {
         return space;
       }
       return null;
-    }catch(e){
+    } catch (e) {
       rethrow;
-    }finally{
+    } finally {
       link.close();
     }
   }
@@ -61,31 +64,37 @@ class SpaceController extends AsyncNotifier<SpaceState> {
   Future<bool> addNewSpace() async {
     final link = ref.keepAlive();
     try {
-
       final spaceRepo = ref.read(spaceRepoProvider);
       final name = ref.read(spaceNameProvider);
-      if(name.trim().isEmpty){
+      if (name.trim().isEmpty) {
         SnackBarService.showError('Enter space name');
         return false;
       }
       final isInternet = ref.read(isInternetConnectedProvider);
       final isUser = ref.read(currentUserProvider).value;
-      if(isUser==null ||isUser.id.isEmpty) {
-        SnackBarService.showError('something went wrong please try again later');
+      if (isUser == null || isUser.id.isEmpty) {
+        SnackBarService.showError(
+          'something went wrong please try again later',
+        );
         return true;
       }
-      final newSpace = await spaceRepo.createSpace(user: isUser, spaceName: name, isInternet: isInternet,isUser: isUser.id);
-      if(newSpace==null) {
+      final newSpace = await spaceRepo.createSpace(
+        user: isUser,
+        spaceName: name,
+        isInternet: isInternet,
+        isUser: isUser.id,
+      );
+      if (newSpace == null) {
         SnackBarService.showError('space created failed');
         return true;
       }
-      if(state.isLoading || state.hasError){
+      if (state.isLoading || state.hasError) {
         SnackBarService.showError('space created failed');
         return true;
       }
 
-      final newSpaces = state.value?.allSpaces ;
-      if(newSpaces ==null || !ref.mounted){
+      final newSpaces = state.value?.allSpaces;
+      if (newSpaces == null || !ref.mounted) {
         SnackBarService.showError('space created failed');
         return true;
       }
@@ -96,7 +105,7 @@ class SpaceController extends AsyncNotifier<SpaceState> {
       return true;
     } catch (e) {
       SnackBarService.showError('Space adding failed $e');
-    }finally{
+    } finally {
       link.close();
     }
     return true;
@@ -110,7 +119,7 @@ class SpaceController extends AsyncNotifier<SpaceState> {
       final spaceRepo = ref.read(spaceRepoProvider);
       final isInternet = ref.read(isInternetConnectedProvider);
 
-      if(user==null || user.id.isEmpty){
+      if (user == null || user.id.isEmpty) {
         SnackBarService.showError('user not found');
         return;
       }
@@ -118,11 +127,11 @@ class SpaceController extends AsyncNotifier<SpaceState> {
         userId: user.id,
         spaceId: spaceId,
         isInternet: isInternet,
-        user: user
+        user: user,
       );
 
-      if(isDeleted==1){
-        if(state.value==null) return;
+      if (isDeleted == 1) {
+        if (state.value == null) return;
         final newList = state.value!.allSpaces
             .where((s) => s.id != spaceId)
             .toList();
@@ -132,7 +141,7 @@ class SpaceController extends AsyncNotifier<SpaceState> {
       }
     } catch (e) {
       SnackBarService.showError('Space deletion failed');
-    }finally{
+    } finally {
       link.close();
       ref.invalidate(currentSpaceProvider);
     }
@@ -141,12 +150,38 @@ class SpaceController extends AsyncNotifier<SpaceState> {
   Future<bool> canSpaceDeleted({required String spaceId}) async {
     try {
       final spaceRepo = ref.read(currentSpaceProvider).value;
-      if(spaceRepo==null){
+      if (spaceRepo == null) {
         SnackBarService.showError('No space found');
         return false;
       }
+      if (spaceRepo.id == spaceId) {
+        SnackBarService.showMessage('Default space cannot be deleted');
 
-      return spaceRepo.id == spaceId;
+        return false;
+      }
+      final isInternet = ref.read(isInternetConnectedProvider);
+      if (!isInternet) {
+        SnackBarService.showMessage('check your internet connection');
+        return false;
+      }
+      final user = ref.read(currentUserProvider).value;
+
+      if (user == null) {
+        SnackBarService.showError('user not found.please try again later');
+        return false;
+      }
+      MemberModel? member = await ref
+          .read(fireStoreServiceProvider)
+          .fetchSingleMemberFromSpace(spaceId: spaceId, userId: user.id);
+      if (member == null) {
+        SnackBarService.showError('user not found.please try again later');
+        return false;
+      }
+      if (member.role == MemberRole.member.name) {
+        SnackBarService.showMessage('only admin can delete space');
+        return false;
+      }
+      return true;
     } catch (e) {
       throw " ";
     }
@@ -162,20 +197,36 @@ class SpaceController extends AsyncNotifier<SpaceState> {
   }
 
   Future<void> changeSpaceName({required SpaceModel space}) async {
-    try{
+    try {
       final spaceRepo = ref.read(spaceRepoProvider);
       final name = ref.read(spaceNameProvider);
-      if(name.trim().isEmpty) {
+      if (name.trim().isEmpty) {
         SnackBarService.showError('Enter space name');
         return;
       }
       bool isInternet = ref.read(isInternetConnectedProvider);
       UserModel? user = ref.read(currentUserProvider).value;
-      if(user==null || user.id.isEmpty) {
+      if (user == null || user.id.isEmpty) {
         SnackBarService.showError("No user found");
         return;
       }
-      await spaceRepo.changeSpaceName(spaceId: space.id, newName: name,isInternet:  isInternet,user:  user);
+      MemberModel? member = await ref
+          .read(fireStoreServiceProvider)
+          .fetchSingleMemberFromSpace(spaceId: space.id, userId: user.id);
+      if (member == null) {
+        SnackBarService.showError('user not found.please try again later');
+        return;
+      }
+      if (member.role == MemberRole.member.name) {
+        SnackBarService.showMessage('only admin can Edit space');
+        return;
+      }
+      await spaceRepo.changeSpaceName(
+        spaceId: space.id,
+        newName: name,
+        isInternet: isInternet,
+        user: user,
+      );
       if (state.isLoading || state.hasError || !ref.mounted) {
         SnackBarService.showMessage("something went wrong");
         return;
@@ -183,7 +234,12 @@ class SpaceController extends AsyncNotifier<SpaceState> {
       final newSpaces = state.value!.allSpaces;
       final list = newSpaces.map((curr) {
         if (curr.id == space.id) {
-          final sp = SpaceModel(userId: curr.userId, name: name, id: curr.id,updatedAt: DateTime.now().toString());
+          final sp = SpaceModel(
+            userId: curr.userId,
+            name: name,
+            id: curr.id,
+            updatedAt: DateTime.now().toString(),
+          );
           return sp;
         }
         SnackBarService.showMessage('space name changed');
@@ -191,41 +247,45 @@ class SpaceController extends AsyncNotifier<SpaceState> {
       }).toList();
       state = AsyncData(SpaceState.copyWith(allSpaces: list));
       ref.invalidate(currentSpaceProvider);
-
-    }catch(e){
+    } catch (e) {
       SnackBarService.showError('changing space name failed.');
     }
   }
 
   Future<void> removeMemberFromSpace({required spaceId}) async {
-    try{
+    try {
       bool isInternet = ref.read(isInternetConnectedProvider);
       UserModel? user = ref.read(currentUserProvider).value;
-      if(user==null || user.id.isEmpty) {
+      if (user == null || user.id.isEmpty) {
         SnackBarService.showError("No user found");
         return;
       }
       final currUserId = user.id;
-      final members = await ref.read(sqfLiteSetupProvider).fetchMemberFromLocal(spaceId: spaceId);
+      final members = await ref
+          .read(sqfLiteSetupProvider)
+          .fetchMemberFromLocal(spaceId: spaceId);
       MemberModel? currMember;
-      for(final mem in members){
-        if(mem.userId==currUserId) {
+      for (final mem in members) {
+        if (mem.userId == currUserId) {
           currMember = mem;
           break;
         }
       }
-      if(currMember==null){
+      if (currMember == null) {
         SnackBarService.showError('No user found');
         return;
       }
       final memberRepo = ref.read(memberRepoProvider);
-       await memberRepo.removeMemberFromSpace(member: currMember,isInternet:  isInternet,user:  user);
-      if(!ref.mounted) return;
+      await memberRepo.removeMemberFromSpace(
+        member: currMember,
+        isInternet: isInternet,
+        user: user,
+      );
+      if (!ref.mounted) return;
 
       ref.invalidateSelf(asReload: true);
       ref.invalidate(currentSpaceProvider);
-
-    }catch(e){
+    } catch (e) {
       SnackBarService.showError('exit space failed. $e');
     }
   }
@@ -257,7 +317,7 @@ class JoinSpaceController {
     try {
       final user = ref.read(currentUserProvider).value;
       final code = ref.read(joinCodeTextProvider);
-      if(user==null){
+      if (user == null) {
         SnackBarService.showMessage('user not found');
         return;
       }
@@ -265,7 +325,7 @@ class JoinSpaceController {
       final userId = firebaseUser?.uid;
       final isInternet = ref.read(isInternetConnectedProvider);
 
-      if (userId == null || user.userType=='guest') {
+      if (userId == null || user.userType == 'guest') {
         SnackBarService.showMessage('Please login first to join new spaces');
         return;
       }
@@ -277,14 +337,19 @@ class JoinSpaceController {
         userId: user.id,
         role: MemberRole.member.name,
       );
-      await _spaceRepository.joinNewSpace(member:member ,isInternet: isInternet,isUser: user);
-
+      await _spaceRepository.joinNewSpace(
+        member: member,
+        isInternet: isInternet,
+        isUser: user,
+      );
     } catch (e) {
       SnackBarService.showError('Space join failed $e');
     }
   }
 }
 
-final addNewSpaceLoadingProvider = StateProvider.autoDispose<bool>((ref) => false);
+final addNewSpaceLoadingProvider = StateProvider.autoDispose<bool>(
+  (ref) => false,
+);
 final defaultSpaceLoadingProvider = StateProvider<bool>((ref) => false);
 final isSpaceJoining = StateProvider.autoDispose<bool>((ref) => false);

@@ -33,27 +33,28 @@ class ItemRepository {
   ItemRepository(this.fireStoreService ,this.ref,  this._sqfLite, this._foodApiService);
 
 
-  Future<void> deleteItem({required String userId,required String itemPath,required String itemId}) async {
+  Future<bool> deleteItem({required String userId,required String itemPath,required String itemId}) async {
     try{
       final spaceId = ref.read(currentSpaceProvider.select((s) => s.value?.id));
       if(spaceId==null){
         SnackBarService.showError('No space found');
-        return;
+        return false;
       }
       final fireStore = ref.read(fireStoreServiceProvider);
       final user = ref.read(currentUserProvider);
       if(user.isLoading || user.hasError || user.value == null || user.value!.id.isEmpty) {
         SnackBarService.showError('No user found');
-        return;
+        return false;
       }
       final isInternet = ref.read(isInternetConnectedProvider);
       if(!isInternet && user.value!.userType=='google'){
         SnackBarService.showMessage('check your internet connection');
-        return;
+        return false;
       }
       if(isInternet && user.value!.userType=='google') await fireStore.deleteItemFromFirebase(spaceId: spaceId,id: itemId);
-      await _sqfLite.deleteItem(itemId : itemId,spaceId: spaceId);
+      final deleted = await _sqfLite.deleteItem(itemId : itemId,spaceId: spaceId);
       await ref.read(apiImageProvider).deleteLocalImage(itemPath);
+      return deleted;
     } on FirebaseAuthException catch (e){
       throw TFirebaseAuthException(e.code).message;
     } on PlatformException catch (e){

@@ -10,7 +10,7 @@ class MembersCardShimmer extends ConsumerWidget{
    return Shimmer(child: Container(
        height: 80,
        // width: 80,
-       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
        decoration: BoxDecoration(
          border: Border.all(width: 1, color: Colors.grey[200]!),
          boxShadow: [
@@ -28,8 +28,8 @@ class MembersCardShimmer extends ConsumerWidget{
    Row(
      mainAxisAlignment: MainAxisAlignment.start,
      children: [
-        Shimmer(child: CircleAvatar(radius: 25,)),
-       SizedBox(width: 32,),
+        Shimmer(child: const CircleAvatar(radius: 25,)),
+       const SizedBox(width: 32,),
        Column(
          crossAxisAlignment: CrossAxisAlignment.start,
          children: [
@@ -43,7 +43,7 @@ class MembersCardShimmer extends ConsumerWidget{
                ),
              ),
            ),
-           SizedBox(height: 8,),
+           const SizedBox(height: 8,),
            Shimmer(
              child: Container(
                width: 32,
@@ -56,7 +56,7 @@ class MembersCardShimmer extends ConsumerWidget{
            )
          ],
        ),
-       Spacer(),
+       const Spacer(),
        Shimmer(
          child: Container(
            width: 16,

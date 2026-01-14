@@ -20,6 +20,7 @@ final memberRepoProvider = Provider((ref) {
 });
 
 class MemberRepository {
+
   final SqfLiteSetup _sqfLiteSetup;
   final FireStoreService _fireStoreService;
 
@@ -126,13 +127,29 @@ class MemberRepository {
         );
         return;
       }
-      await _sqfLiteSetup.updateMember(member: member, map: map);
       if (user.userType == 'google') {
-        await _fireStoreService.changeMemberRole(member, changeRoleTO);
-      }
-      SnackBarService.showSuccess(
-        ' ${member.name}\'s role changed successfully',
+       final res = await _fireStoreService.changeMemberRole(member, changeRoleTO);
+       if(res==1){
+         await _sqfLiteSetup.updateMember(member: member, map: map);
+         SnackBarService.showSuccess(
+           ' ${member.name}\'s role changed successfully',
+         );
+
+       }else if(res==0){
+         SnackBarService.showMessage(
+           'space should have at least a admin',
+         );
+       }else{
+         SnackBarService.showMessage(
+           'member not found',
+         );
+       }
+      }else{
+
+      SnackBarService.showMessage(
+        'space should have at least 1 Admin',
       );
+      }
     } on FirebaseAuthException catch (e) {
       throw TFirebaseAuthException(e.code).message;
     } on PlatformException catch (e) {

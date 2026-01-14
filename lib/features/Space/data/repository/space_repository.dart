@@ -264,7 +264,7 @@ class SpaceRepository {
         await _sqfRepo.markItemAsSynced(item.id);
       }
 
-      List members = await _fireStoreService.fetchMembersFromSpace(userId,
+      List members = await _fireStoreService.fetchMembersFromSpace(
         spaceId: spaceId,
       );
 
