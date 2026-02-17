@@ -1,8 +1,10 @@
 import 'dart:math';
 
-import 'package:expiry_wise_app/features/Space/data/repository/space_repository.dart';
+import 'package:expiry_wise_app/features/Space/presentation/controllers/spaceServices/space_services.dart';
 import 'package:expiry_wise_app/features/User/data/models/user_model.dart';
+import 'package:expiry_wise_app/features/User/domain/user_repository_interface.dart';
 import 'package:expiry_wise_app/features/User/presentation/controllers/user_controller.dart';
+import 'package:expiry_wise_app/features/auth/presentation/controllers/auth_services.dart';
 import 'package:expiry_wise_app/routes/route.dart';
 import 'package:expiry_wise_app/services/local_db/prefs_service.dart';
 import 'package:expiry_wise_app/services/remote_db/fire_store_service.dart';
@@ -12,79 +14,28 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../routes/presentation/controllers/route_controller.dart';
 import '../../../../services/Connectivity/internet_connectivity.dart';
+import '../../../../services/local_db/sqflite_setup.dart';
 import '../../data/repository/authentication_repository.dart';
 
-final loginStateProvider = StateNotifierProvider.autoDispose<LoginStateController, bool>(
-  (ref) => LoginStateController(ref, false),
+final authControllerProvider = StateNotifierProvider<AuthController, bool>(
+  (ref) => AuthController(ref, false),
 );
 
-class LoginStateController extends StateNotifier<bool> {
+class AuthController extends StateNotifier<bool> {
   final AuthenticationRepository authRepository;
   final Ref ref;
-  final CurrentUser userRepository;
-  final PrefsService _prefs;
 
-  LoginStateController(this.ref, super._state)
-    : authRepository = ref.read(authRepositoryProvider),
-      userRepository = ref.read(currentUserProvider.notifier),
-        _prefs = ref.read(prefsServiceProvider)
+  AuthController(this.ref, super._state)
+    : authRepository = ref.read(authRepositoryProvider)
   ;
 
   Future<void> continueWithGoogle() async {
     final link = ref.keepAlive();
     try {
-
-      final isInternet = ref.read(isInternetConnectedProvider);
-      if(!isInternet) {
-        SnackBarService.showMessage('please check your internet connection');
-        return;
-      }
-      final credential = await authRepository.loginWithGoogle();
-      // print("cred ${credential?.user}");
-
-      if(credential==null || credential.user==null) {
-        SnackBarService.showMessage('login failed');
-        return;
-      }
-
-      final user = await userRepository.loadUserOnLogin(credential.user!.uid,credential.user!.email??'');
-
-      if(user==null){
-
-        final fireStoreService = ref.read(fireStoreServiceProvider);
-        final spaceRepo = ref.read(spaceRepoProvider);
-
-        String name = credential.user!.displayName?? "User${_generateNameSuffix()}" ;
-        String email =  credential.user!.email?? '';
-
-        UserModel user = UserModel(
-          updatedAt: DateTime.now().toString(),
-          id: credential.user!.uid,
-          name: name,
-          email: email,
-          userType: "google",
-          photoUrl: credential.user!.photoURL??"",
-        );
-
-        await userRepository.saveUserLocally(user: user);
-        await fireStoreService.addUserTOFirebase(user);
-
-        //
-        final isInternet = ref.read(isInternetConnectedProvider);
-        final isUser = FirebaseAuth.instance.currentUser?.uid;
-        await _prefs.setCurrentUserId(user.id);
-
-        ref.read(currentUserProvider).value!.copyWith(id: user.id,name: user.name,photoUrl: user.photoUrl,userType: 'google',email: user.email);
-
-        await spaceRepo.createSpace(user: user,spaceName: "My Space",isInternet: isInternet,isUser: isUser);
-
-      }
-      else {
-
-
-        await _prefs.setCurrentUserId(user.id);
-      }
+      await ref.read(authServicesProvider).continueWithGoogleUseCase();
+      ref.invalidate(currentUserProvider);
       MYRoute.appRouter.goNamed(MYRoute.screenRedirect);
     } catch (e) {
       SnackBarService.showError('Login with google failed. $e');
@@ -97,52 +48,30 @@ class LoginStateController extends StateNotifier<bool> {
   Future<void> continueAsGuest() async {
     final link = ref.keepAlive();
     try{
-      String id = Uuid().v1();
-      final spaceRepo = ref.read(spaceRepoProvider);
-
-      final isInternet = ref.read(isInternetConnectedProvider);
-      final isUser = ref.read(loggedInUserProvider);
-      String name = "Guest_${_generateNameSuffix()}";
-      String email = "";
-      UserModel user = UserModel(
-        updatedAt: DateTime.now().toString(),
-        id: id,
-        name: name,
-        email: email,
-        userType: "guest",
-        photoUrl: "",
-      );
-      await userRepository.saveUserLocally(user: user);
-      //
-      await spaceRepo.createSpace(user: user,
-          spaceName: "My Space",
-          isInternet: isInternet,
-          isUser: isUser.value);
-      await _prefs.setCurrentUserId(user.id);
+      await ref.read(authServicesProvider).continueAsGuestUseCase();
+      ref.invalidate(currentUserProvider);
       MYRoute.appRouter.goNamed(MYRoute.screenRedirect);
     }catch (e){
-      SnackBarService.showError('guest login failed ');
+      SnackBarService.showError('$e');
     }finally{
       link.close();
     }
   }
 
+  Future<void> logOutUser() async {
 
-  String _generateNameSuffix() {
-    String s = "";
-    for (int i = 0; i < 2; i++) {
-      final random = Random();
-      const String characters =
-          'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; // Define your character set
-
-      // Get a random index within the range of the character set's length
-      int randomIndex = random.nextInt(characters.length);
-
-      // Return the character at the random index
-      s = s + characters[randomIndex];
-    }
-    return s;
+    final authRepo = ref.read(authRepositoryProvider);
+    await authRepo.logOutUser();
+    ref.invalidate(currentUserProvider);
+    ref.read(screenRedirectProvider).screenRedirect();
   }
+
+  Future<void> deleteUser() async {
+    final user = ref.read(currentUserProvider).value;
+    await ref.read(authServicesProvider).deleteUserUseCase(user: user);
+    ref.invalidate(currentUserProvider);
+  }
+
 }
 
 final isLoginProvider = StateProvider.autoDispose<bool>((ref)=>false);

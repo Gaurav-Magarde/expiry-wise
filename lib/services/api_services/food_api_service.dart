@@ -7,7 +7,7 @@ final foodApiProvider = Provider<FoodApiService>((ref)=>FoodApiService());
 
 class FoodApiService{
 
-  static get instance => FoodApiService();
+  static FoodApiService get instance => FoodApiService();
   static const  String _baseUrl = ApiKeys.imageUrl;
 
   Future<Map<String,dynamic>?> getProductByBarcode(String barcode)async{

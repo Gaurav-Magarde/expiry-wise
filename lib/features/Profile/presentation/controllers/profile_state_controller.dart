@@ -1,19 +1,16 @@
 import 'package:expiry_wise_app/features/Profile/presentation/controllers/profile_state.dart';
-import 'package:expiry_wise_app/features/User/data/models/user_model.dart';
 import 'package:expiry_wise_app/features/User/presentation/controllers/user_controller.dart';
-import 'package:expiry_wise_app/routes/presentation/controllers/route_controller.dart';
+import 'package:expiry_wise_app/features/auth/presentation/controllers/login_controller.dart';
 import 'package:expiry_wise_app/services/local_db/prefs_service.dart';
-import 'package:expiry_wise_app/services/local_db/sqflite_setup.dart';
-import 'package:expiry_wise_app/services/notification_services/local_notification_service.dart';
-import 'package:expiry_wise_app/services/remote_db/fire_store_service.dart';
 import 'package:expiry_wise_app/services/sync_services/local_firebase_syncing.dart';
 import 'package:expiry_wise_app/core/utils/snackbars/snack_bar_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/src/material/time.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:workmanager/workmanager.dart';
 
-import '../../../../services/Connectivity/internet_connectivity.dart';
+import '../../../../services/workmanager/work_manager_service.dart';
+
 
 final profileStateProvider =
     NotifierProvider<ProfileStateController, ProfileState>(() {
@@ -21,69 +18,27 @@ final profileStateProvider =
     });
 
 class ProfileStateController extends Notifier<ProfileState> {
+
   ProfileStateController();
 
   Future<void> deleteUser() async {
-    final user = ref.read(currentUserProvider);
-    if (user.value == null ||
-        user.isLoading ||
-        user.hasError ||
-        user.value!.id.isEmpty) {
-      SnackBarService.showError('user not found.please try again later');
-      return;
+    final link = ref.keepAlive();
+    try{
+      await ref.read(authControllerProvider.notifier).deleteUser();
+      ref.invalidate(currentUserProvider);
+    }catch(e){
+      SnackBarService.showError('Error : ${e.toString()}');
     }
-    final isInternet = ref.read(isInternetConnectedProvider);
-    final currentUser = user.value!;
-    if (currentUser.userType == 'google' && !isInternet) {
-      SnackBarService.showMessage('check your internet connection');
-      return;
-    }
-    final sqf = ref.read(sqfLiteSetupProvider);
-    final prefs = ref.read(prefsServiceProvider);
-    final fireStore = ref.read(fireStoreServiceProvider);
-    await sqf.deleteDataBase();
-    await prefs.clearAllPrefs();
-    if (currentUser.userType == 'google') {
-      await fireStore.deleteUserFromFirebase(userId: currentUser.id);
-      if (FirebaseAuth.instance.currentUser != null) {
-        await FirebaseAuth.instance.signOut();
-      }
-    }
-    ref.invalidate(currentUserProvider);
+    link.close();
   }
 
   Future<void> logOutUser() async {
-    final user = ref.read(currentUserProvider);
-    if (user.value == null ||
-        user.isLoading ||
-        user.hasError ||
-        user.value!.id.isEmpty) {
-      SnackBarService.showError('user not found.please try again later');
-      return;
-    }
-    final isInternet = ref.read(isInternetConnectedProvider);
-    final currentUser = user.value!;
-    if (currentUser.userType == 'google' && !isInternet) {
-      SnackBarService.showMessage('check your internet connection');
-      return;
-    }
-    final sqf = ref.read(sqfLiteSetupProvider);
-    final prefs = ref.read(prefsServiceProvider);
-    await sqf.deleteDataBase();
-    await prefs.clearAllPrefs();
-    if (currentUser.userType == 'google') {
-      if (FirebaseAuth.instance.currentUser != null) {
-        await FirebaseAuth.instance.signOut();
-      }
-      FirebaseStreams firebaseStream = ref.read(firebaseStreamProvider);
-    }
-    ref.invalidate(currentUserProvider);
-    ref.read(screenRedirectProvider).screenRedirect();
+    final auth = ref.read(authControllerProvider.notifier);
+    await auth.logOutUser();
   }
 
   Future<void> initializeUserData() async {
     final prefs = ref.read(prefsServiceProvider);
-
     final user = ref.read(currentUserProvider).value!;
     String name = user.name;
     String photoUrl = user.photoUrl;
@@ -110,83 +65,48 @@ class ProfileStateController extends Notifier<ProfileState> {
     ref.listen(currentUserProvider, (_, __) {
       initializeUserData();
     });
-
     initializeUserData();
-
     return ProfileState(
       autoSync: false,
       notification: false,
       photoUrl: '',
       name: '',
       email: '',
-      notificationTime: TimeOfDay(hour: 09, minute: 00),
+      notificationTime: const TimeOfDay(hour: 09, minute: 00),
       selectedDays: [],
       itemAlert: false,
     );
   }
 
+
   Future<void> changeName(newName) async {
     try {
-      if (newName.trim().isEmpty) {
-        SnackBarService.showError('Please enter name');
-        return;
-      }
-      final isInternet = ref.read(isInternetConnectedProvider);
-      final user = ref.read(currentUserProvider).value;
-      if (user == null || user.id.isEmpty) {
-        SnackBarService.showError('user not found');
-        return;
-      }
-      final sqf = ref.read(sqfLiteSetupProvider);
-      final fireStore = ref.read(fireStoreServiceProvider);
-      Map<String, dynamic> map = {'name': newName};
-      final userId = user.id;
-      if (user.userType == 'guest') {
-        await sqf.updateUser(map, userId);
-        state = state.copyWith(name: newName);
-      } else if (user.userType == 'google') {
-        if (!isInternet) {
-          SnackBarService.showMessage(
-            'Name change failed.please check internet connection!',
-          );
-          return;
-        }
-        await sqf.updateUser(map, userId);
-        final newUser = UserModel(
-          photoUrl: user.photoUrl,
-          userType: user.userType,
-          name: newName,
-          email: user.email,
-          updatedAt: user.updatedAt,
-          id: user.id,
-        );
-        await fireStore.saveUserTOFirebase(newUser);
-        await ref.read(currentUserProvider.notifier).fetchNewName(userId);
-      }
+      await ref.read(currentUserProvider.notifier).changeName(newName);
       SnackBarService.showSuccess('Name changed successfully');
     } catch (e) {
       SnackBarService.showError('Name changed failed ');
     }
   }
 
+
   Future<void> changeNotificationAlert(bool notification) async {
     try {
       final prefs = ref.read(prefsServiceProvider);
       await prefs.setNotificationStatus(notification);
+      if(notification) {
+        await _reScheduleNotification();
+      } else {
+        await _cancelNotification();
+      }
       state = state.copyWith(notification: notification);
       SnackBarService.showMessage(
         notification ? 'notification alerts on' : 'notification alerts off',
       );
-      bool isNotify = await prefs.getIsNotificationOn();
-      if (isNotify) {
-        ref.read(notificationServiceProvider).reScheduleAllNotification();
-      } else {
-        ref.read(notificationServiceProvider).cancelAllNotification();
-      }
     } catch (e) {
       SnackBarService.showError('Notification alert failed ');
     }
   }
+
 
   Future<void> changeItemDeleteAlert(bool delete) async {
     try {
@@ -201,24 +121,12 @@ class ProfileStateController extends Notifier<ProfileState> {
 
   Future<void> changeAutoSync(bool autoSync) async {
     try {
-      final user = ref.read(currentUserProvider).value;
-      if (user == null || user.id.isEmpty) {
-        SnackBarService.showError('user not found');
-        return;
-      }
-      if (user.userType == 'guest') {
-        SnackBarService.showMessage(
-          'please login first to auto sync the items!',
-        );
-        return;
-      }
-      final prefs = ref.read(prefsServiceProvider);
-      await prefs.setAutoSync(autoSync);
+      await ref.read(currentUserProvider.notifier).toggleAutoSync(autoSync);
       state = state.copyWith(autoSync: autoSync);
       SnackBarService.showMessage(autoSync ? 'Auto sync on' : 'Auto sync off');
     } catch (e) {
       SnackBarService.showError(
-        autoSync ? 'Auto sync on failed ' : 'Auto sync off failed ',
+        e.toString()
       );
     }
   }
@@ -227,11 +135,9 @@ class ProfileStateController extends Notifier<ProfileState> {
     try {
       final prefs = ref.read(prefsServiceProvider);
       final time = await prefs.setNotificationTime(pickedTime);
+      await _reScheduleNotification();
       state = state.copyWith(notificationTime: pickedTime);
       SnackBarService.showMessage('Notification time changed to $time');
-      bool isNotify = await prefs.getIsNotificationOn();
-      if (isNotify)
-        ref.read(notificationServiceProvider).reScheduleAllNotification();
     } catch (e) {
       SnackBarService.showError(' Notification Time change failed $e');
     }
@@ -244,7 +150,7 @@ class ProfileStateController extends Notifier<ProfileState> {
     } catch (e) {
       SnackBarService.showMessage('Something went wrong');
     }
-    return TimeOfDay(hour: 0, minute: 0);
+    return const TimeOfDay(hour: 0, minute: 0);
   }
 
   Future<void> setNotificationDays(List<int> selectedDays) async {
@@ -269,26 +175,44 @@ class ProfileStateController extends Notifier<ProfileState> {
 
   Future<void> manualSync() async {
     try {
-      final isInternet = ref.read(isInternetConnectedProvider);
-      final user = ref.read(currentUserProvider);
-      if (user.value == null || user.value!.id.isEmpty) {
-        SnackBarService.showError('sync failed user not found');
-        return;
-      }
-      if (!isInternet) {
-        SnackBarService.showMessage('no internet connection');
-        return;
-      }
-      if (user.value!.userType == 'guest') {
-        SnackBarService.showMessage('login to sync items');
-        return;
-      }
-      print('performing dat sync ');
-
       await ref.read(syncProvider).performAutoSync(isAllSync: true).timeout(Duration(seconds: 30));
-    } catch (e) {}
+    } catch (e) {
+      SnackBarService.showError(e.toString());
+    }
+  }
+
+Future<void> _reScheduleNotification() async {
+  final time = await getNotificationTime();
+  final delay = _calculateInitialDelay(time.hour, time.minute);
+  await Workmanager().registerPeriodicTask(
+    'notification_task',taskExpiryCheck,initialDelay: delay,
+    frequency: const Duration(days: 1),
+    constraints: Constraints(
+      networkType: NetworkType.notRequired,
+      requiresBatteryNotLow: false,
+      requiresCharging: false,
+      requiresDeviceIdle: false,
+      requiresStorageNotLow: false,
+    ),
+  );
+}
+
+Duration _calculateInitialDelay(int targetHour, int targetMinute) {
+  final now = DateTime.now();
+  final target = DateTime(now.year, now.month, now.day, targetHour, targetMinute);
+
+  // Agar target time nikal chuka hai, toh kal ka time set karein
+  if (target.isBefore(now)) {
+    return target.add(const Duration(days: 1)).difference(now);
+  }
+  return target.difference(now);
+}
+
+  Future<void> _cancelNotification() async {
+   await Workmanager().cancelByUniqueName('notification_task');
   }
 }
 
 final isDialerLoadingProvider = StateProvider.autoDispose<bool>((ref) => false);
 final isItemsSyncingProvider = StateProvider.autoDispose<bool>((ref) => false);
+

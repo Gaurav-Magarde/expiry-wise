@@ -3,7 +3,6 @@ import 'package:expiry_wise_app/core/utils/snackbars/snack_bar_service.dart';
 import 'package:expiry_wise_app/core/utils/validators/validators.dart';
 import 'package:expiry_wise_app/features/expenses/data/models/expense_model.dart';
 import 'package:expiry_wise_app/features/expenses/presentation/controllers/edit_expense_provider.dart';
-import 'package:expiry_wise_app/features/inventory/presentation/controllers/add_item_controllers/add_items_controller.dart';
 import 'package:expiry_wise_app/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -56,7 +55,9 @@ class _EditExpenseFormState extends ConsumerState<EditExpenseForm> {
   @override
   Widget build(BuildContext context) {
     final controller = ref.watch(editExpenseProvider(widget.id).notifier);
-    final paidBy = ref.watch(editExpenseProvider(widget.id).select((exp)=>exp.paidBY));
+    final paidBy = ref.watch(
+      editExpenseProvider(widget.id).select((exp) => exp.paidBY),
+    );
 
     return SingleChildScrollView(
       child: Padding(
@@ -66,13 +67,15 @@ class _EditExpenseFormState extends ConsumerState<EditExpenseForm> {
           children: [
             Consumer(
               builder: (_, ref, _) {
-               final selected =  ref.watch(editExpenseProvider(widget.id).select((exp)=>exp.category));
+                final selected = ref.watch(
+                  editExpenseProvider(widget.id).select((exp) => exp.category),
+                );
                 return Container(
                   padding: const EdgeInsets.all(24),
                   margin: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     // color: Colors.white,
-                    border: Border.all(width: 3,color: selected.color),
+                    border: Border.all(width: 3, color: selected.color),
                     borderRadius: BorderRadius.circular(100),
                     boxShadow: [
                       BoxShadow(
@@ -82,7 +85,8 @@ class _EditExpenseFormState extends ConsumerState<EditExpenseForm> {
                         color: Colors.grey.shade100,
                       ),
                     ],
-                  ),                  child: Icon(selected.icon, size: 50,color: selected.color,),
+                  ),
+                  child: Icon(selected.icon, size: 50, color: selected.color),
                 );
               },
             ),
@@ -91,11 +95,23 @@ class _EditExpenseFormState extends ConsumerState<EditExpenseForm> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(width: 8,),
+                  SizedBox(width: 8),
 
-                  Icon(Icons.person,color: Colors.grey,size: 25,),
-                  SizedBox(width: 8,),
-                  if(paidBy!=null)Flexible(child: Text( "Paid by $paidBy",style: Theme.of(context).textTheme.titleMedium!.apply(fontWeightDelta: 4,color: Colors.grey),maxLines: 1,overflow: TextOverflow.ellipsis,textAlign: TextAlign.left,)),
+                  Icon(Icons.person, color: Colors.grey, size: 25),
+                  SizedBox(width: 8),
+                  if (paidBy != null)
+                    Flexible(
+                      child: Text(
+                        "Paid by $paidBy",
+                        style: Theme.of(context).textTheme.titleMedium!.apply(
+                          fontWeightDelta: 4,
+                          color: Colors.grey,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -133,11 +149,11 @@ class _EditExpenseFormState extends ConsumerState<EditExpenseForm> {
                               builder: (context, ref, child) {
                                 return TextFormFieldWidget(
                                   controller: _titleController,
-                                  prefixIcon: Icon(
+                                  prefixIcon: const Icon(
                                     Icons.shopping_bag,
                                     color: EColors.accentPrimary,
                                   ),
-                                  hint: "eg. Paid for groceries",
+                                  hint: 'eg. Paid for groceries',
                                   labelText: 'Title',
                                 );
                               },
@@ -157,7 +173,7 @@ class _EditExpenseFormState extends ConsumerState<EditExpenseForm> {
                         ).select((s) => s.category),
                       );
                       final selected = ExpenseCategory.values.firstWhere(
-                        (e) => e == selectedCategory,
+                            (e) => e == selectedCategory,
                         orElse: () => ExpenseCategory.grocery,
                       );
 
@@ -242,9 +258,9 @@ class _EditExpenseFormState extends ConsumerState<EditExpenseForm> {
                           DateTime? pickedDate = await showDatePicker(
                             context: context,
                             initialDate:
-                                DateFormat(
-                                  DateFormatPattern.dateformatPattern,
-                                ).tryParse(selectedDate ?? '') ??
+                            DateFormat(
+                              DateFormatPattern.dateformatPattern,
+                            ).tryParse(selectedDate ?? '') ??
                                 DateTime.now(),
                             firstDate: DateTime(2001),
                             lastDate: DateTime(2100),
@@ -257,32 +273,32 @@ class _EditExpenseFormState extends ConsumerState<EditExpenseForm> {
                           }
                         },
                         child: InputDecorator(
-                          decoration: InputDecoration(
-                            labelText: "Transaction Date",
-                            labelStyle: const TextStyle(color: Colors.grey),
+                          decoration: const InputDecoration(
+                            labelText: 'Transaction Date',
+                            labelStyle: TextStyle(color: Colors.grey),
                             prefixIcon: Icon(
                               Icons.date_range,
                               color: EColors.accentPrimary,
                             ),
 
-                            border: const OutlineInputBorder(
+                            border: OutlineInputBorder(
                               borderRadius: BorderRadius.all(
                                 Radius.circular(6),
                               ),
                             ),
-                            enabledBorder: const OutlineInputBorder(
+                            enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.all(
                                 Radius.circular(6),
                               ),
                               borderSide: BorderSide(color: Colors.grey),
                             ),
-                            contentPadding: const EdgeInsets.symmetric(
+                            contentPadding: EdgeInsets.symmetric(
                               horizontal: 12,
                               vertical: 14,
                             ),
                           ),
                           child: Text(
-                            '$selectedDate' ?? "select transaction date",
+                            selectedDate,
                             style: const TextStyle(fontSize: 16),
                           ),
                         ),
@@ -295,9 +311,9 @@ class _EditExpenseFormState extends ConsumerState<EditExpenseForm> {
                     builder: (context, ref, child) {
                       return TextFormFieldWidget(
                         controller: _noteController,
-                        hint: "Add a Note",
-                        labelText: "Note(optional)",
-                        prefixIcon: Icon(
+                        hint: 'Add a Note',
+                        labelText: 'Note(optional)',
+                        prefixIcon: const Icon(
                           Icons.message,
                           color: EColors.accentPrimary,
                         ),
@@ -319,11 +335,11 @@ class _EditExpenseFormState extends ConsumerState<EditExpenseForm> {
                   if (!Validators.validateAmount(
                     amount: _amountController.text,
                   )) {
-                    SnackBarService.showMessage("Enter a valid amount");
+                    SnackBarService.showMessage('Enter a valid amount');
                     return;
                   }
                   if (!Validators.validateName(name: _titleController.text)) {
-                    SnackBarService.showMessage("Enter a title for expense");
+                    SnackBarService.showMessage('Enter a title for expense');
                     return;
                   }
                   controller.copyWith(
@@ -336,22 +352,27 @@ class _EditExpenseFormState extends ConsumerState<EditExpenseForm> {
                 },
                 child: Consumer(
                   builder: (_, ref, __) {
-                    final isLoading = ref.watch(isItemAddingProvider);
+                    final isLoading = ref.watch(
+                      editExpenseProvider(
+                        widget.id,
+                      ).select((s) => s.isExpenseSaving),
+                    );
+
                     return isLoading
-                        ? Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                              ),
-                            ),
-                          )
+                        ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(4.0),
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                        ),
+                      ),
+                    )
                         : Text(
-                            "Save Expense",
-                            style: Theme.of(
-                              context,
-                            ).textTheme.titleMedium!.apply(color: Colors.white),
-                          );
+                      'Save Expense',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.titleMedium!.apply(color: Colors.white),
+                    );
                   },
                 ),
               ),
@@ -372,13 +393,13 @@ class PriceEditingWidget extends ConsumerWidget {
       child: TextFormFieldWidget(
         controller: controller,
         labelText: 'Amount',
-        hint: "eg.500",
+        hint: 'eg.500',
         onChanged: (v) {},
-        prefixIcon: Icon(
+        prefixIcon: const Icon(
           Icons.currency_rupee_outlined,
           color: EColors.accentPrimary,
         ),
-        textInputType: TextInputType.numberWithOptions(
+        textInputType: const TextInputType.numberWithOptions(
           decimal: false,
           signed: false,
         ),

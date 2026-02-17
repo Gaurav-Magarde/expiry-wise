@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../../core/theme/colors.dart';
-import '../../../../data/models/item_model.dart';
+import '../../../../domain/item_model.dart';
 class ItemDetailCard extends StatelessWidget {
   const ItemDetailCard({
     super.key,

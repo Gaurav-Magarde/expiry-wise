@@ -35,11 +35,6 @@ class PopupButtonSpace extends ConsumerWidget {
           if (v == 'delete') {
             final controller =
             ref.read(spaceControllerProvider.notifier);
-            final canDelete = await controller.canSpaceDeleted(
-                spaceId: space.id);
-            if (!canDelete) {
-              return;
-            }
             await controller.deleteSpace(spaceId: space.id);
           } else if (v == 'member') {
             final controller =
@@ -69,7 +64,7 @@ class PopupButtonSpace extends ConsumerWidget {
               children: [
                 Icon(Icons.edit_outlined, size: 20, color: Colors.black87),
                 SizedBox(width: 8),
-                Text("Rename"),
+                Text('Rename'),
               ],
             ),
           ),

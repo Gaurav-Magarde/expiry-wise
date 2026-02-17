@@ -16,7 +16,7 @@ class AddItemFloatingButton extends ConsumerWidget {
       onTap: onTap,
       child: Container(
         clipBehavior: Clip.hardEdge,
-        padding: EdgeInsets.symmetric(vertical: 12,horizontal: 16),
+        padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 16),
         decoration: BoxDecoration(
             color: EColors.primary,
             borderRadius: BorderRadius.circular(24)

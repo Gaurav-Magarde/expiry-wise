@@ -13,7 +13,6 @@ class TotalExpenseInfo extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     final currentLabel = ref.watch(selectedDateLabelExpense);
 
     return Padding(
@@ -21,10 +20,19 @@ class TotalExpenseInfo extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Consumer(builder:(_,ref,_){
-            final total = ref.watch(totalAmount);
-            return Text(Helper.formatCurrency(total), style: Theme.of(context).textTheme.titleMedium!.apply(color: EColors.primaryDark,fontWeightDelta: 5,fontSizeDelta: 2));
-          }),
+          Consumer(
+            builder: (_, ref, _) {
+              final total = ref.watch(totalAmount);
+              return Text(
+                Helper.formatCurrency(total),
+                style: Theme.of(context).textTheme.titleMedium!.apply(
+                  color: EColors.primaryDark,
+                  fontWeightDelta: 5,
+                  fontSizeDelta: 2,
+                ),
+              );
+            },
+          ),
           const Spacer(),
 
           FilterChip(
@@ -36,23 +44,28 @@ class TotalExpenseInfo extends ConsumerWidget {
               children: [
                 Text(
                   currentLabel,
-                  style: Theme.of(context).textTheme.labelSmall!.apply(color: EColors.primaryDark,fontWeightDelta: 4),
+                  style: Theme.of(context).textTheme.labelSmall!.apply(
+                    color: EColors.primaryDark,
+                    fontWeightDelta: 4,
+                  ),
                 ),
-                SizedBox(width: 4,),
-                Icon(Icons.arrow_drop_down_outlined,color:  EColors.primaryDark,)
+                SizedBox(width: 4),
+                Icon(
+                  Icons.arrow_drop_down_outlined,
+                  color: EColors.primaryDark,
+                ),
               ],
             ),
             onSelected: (bool value) {
               _openFilterSheet(context, ref);
             },
-          )
+          ),
         ],
       ),
     );
   }
 
   void _openFilterSheet(BuildContext context, WidgetRef ref) async {
-
     List<DateTime?> tempDates = [
       ref.read(startDateInterval),
       ref.read(lastDateInterval),
@@ -68,7 +81,6 @@ class TotalExpenseInfo extends ConsumerWidget {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-
             void applyPreset(String type) {
               final now = DateTime.now();
               DateTime start, end;
@@ -88,7 +100,7 @@ class TotalExpenseInfo extends ConsumerWidget {
 
               setModalState(() {
                 tempDates = [start, end]; // Calendar update hoga
-                tempLabel = type;         // Label update hoga
+                tempLabel = type; // Label update hoga
               });
             }
 
@@ -102,8 +114,17 @@ class TotalExpenseInfo extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Filter Expenses", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
+                      const Text(
+                        'Filter Expenses',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 10),
@@ -113,11 +134,20 @@ class TotalExpenseInfo extends ConsumerWidget {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        _buildFilterChip("This Week", () => applyPreset("This Week")),
+                        _buildFilterChip(
+                          'This Week',
+                          () => applyPreset('This Week'),
+                        ),
                         const SizedBox(width: 8),
-                        _buildFilterChip("This Month", () => applyPreset("This Month")),
+                        _buildFilterChip(
+                          'This Month',
+                          () => applyPreset('This Month'),
+                        ),
                         const SizedBox(width: 8),
-                        _buildFilterChip("Last Month", () => applyPreset("Last Month")),
+                        _buildFilterChip(
+                          'Last Month',
+                          () => applyPreset('Last Month'),
+                        ),
                       ],
                     ),
                   ),
@@ -137,7 +167,8 @@ class TotalExpenseInfo extends ConsumerWidget {
                         // Agar user manually calendar pe tap kare
                         setModalState(() {
                           tempDates = dates;
-                          tempLabel = "${DateFormat(DateFormat.ABBR_MONTH_DAY).format(tempDates[0]!)}-${DateFormat(DateFormat.ABBR_MONTH_DAY).format(tempDates[1]!)}"; // Label change karke Custom kar do
+                          tempLabel =
+                              '${DateFormat(DateFormat.ABBR_MONTH_DAY).format(tempDates[0] ?? DateTime(2099))}-${DateFormat(DateFormat.ABBR_MONTH_DAY).format(tempDates.length>1 ? tempDates[1] ?? DateTime(2029):DateTime(2099))}'; // Label change karke Custom kar do
                         });
                       },
                     ),
@@ -149,18 +180,26 @@ class TotalExpenseInfo extends ConsumerWidget {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.indigo,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: () {
                         if (tempDates.length == 2) {
-                          ref.read(startDateInterval.notifier).state = tempDates[0]!.toDateOnly;
-                          ref.read(lastDateInterval.notifier).state = tempDates[1]!.toDateOnly;
-                          ref.read(selectedDateLabelExpense.notifier).state = tempLabel;
+                          ref.read(startDateInterval.notifier).state =
+                              tempDates[0]!.toDateOnly;
+                          ref.read(lastDateInterval.notifier).state =
+                              tempDates[1]!.toDateOnly;
+                          ref.read(selectedDateLabelExpense.notifier).state =
+                              tempLabel;
                           Navigator.pop(context); // Sheet band
                         }
                       },
-                      child: const Text("Apply Filter", style: TextStyle(color: Colors.white, fontSize: 16)),
+                      child: const Text(
+                        'Apply Filter',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
                     ),
                   ),
                 ],
@@ -179,7 +218,10 @@ class TotalExpenseInfo extends ConsumerWidget {
       backgroundColor: Colors.grey.shade100,
       side: BorderSide.none,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      labelStyle: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w500),
+      labelStyle: const TextStyle(
+        color: Colors.black87,
+        fontWeight: FontWeight.w500,
+      ),
       onPressed: onTap, // Callback yahan connect kiya
     );
   }

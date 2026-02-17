@@ -1,5 +1,6 @@
 import 'dart:io';
-import 'package:expiry_wise_app/features/inventory/data/models/item_model.dart';
+import 'package:expiry_wise_app/features/inventory/data/datasource/inventory_local_datasource_interface.dart';
+import 'package:expiry_wise_app/features/inventory/domain/item_model.dart';
 import 'package:expiry_wise_app/services/local_db/prefs_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,8 +8,6 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-
-import '../local_db/sqflite_setup.dart';
 
 final notificationServiceProvider = Provider<LocalNotificationService>(
       (ref) => LocalNotificationService(ref),
@@ -40,7 +39,7 @@ class LocalNotificationService {
     AndroidInitializationSettings('@mipmap/ic_launcher');
 
     final DarwinInitializationSettings initializationSettingsDarwin =
-    DarwinInitializationSettings(
+    const DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
@@ -72,7 +71,7 @@ class LocalNotificationService {
   }
 
   int _generateNotificationId(String itemId, int daysBefore) {
-    return "${itemId}_$daysBefore".hashCode.abs();
+    return '${itemId}_$daysBefore'.hashCode.abs();
   }
 
   Future<void> scheduleNotification({
@@ -183,7 +182,7 @@ class LocalNotificationService {
     try {
       final isNotify = await _prefsService.getIsNotificationOn();
       if(!isNotify) return;
-      final items = await ref.read(sqfLiteSetupProvider).fetchAllItems();
+      final items = await ref.read(inventoryLocalDataSourceProvider).fetchAllItems();
       final time = await _prefsService.getNotificationTime();
 
       final now = tz.TZDateTime.now(tz.local);

@@ -1,6 +1,5 @@
 import 'package:expiry_wise_app/core/widgets/shimmers/product_loading_listview.dart';
 import 'package:expiry_wise_app/features/Space/presentation/controllers/current_space_provider.dart';
-import 'package:expiry_wise_app/features/inventory/presentation/screens/all_items/widgets/all_category_chips_widget.dart';
 import 'package:expiry_wise_app/features/inventory/presentation/widgets/item_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,8 +8,9 @@ import 'package:go_router/go_router.dart';
 import '../../../../../../routes/route.dart';
 import '../../../../../../services/sync_services/local_firebase_syncing.dart';
 import '../../../../../../core/theme/colors.dart';
-import '../../../../data/models/item_model.dart';
-import '../../../controllers/item_controller/all_item_controller.dart';
+import '../../../../domain/item_model.dart';
+import '../../../controllers/all_item_controller.dart';
+import '../../../controllers/item_controller.dart';
 
 class SortableList extends ConsumerWidget {
   const SortableList({super.key});
@@ -58,14 +58,9 @@ class SortableList extends ConsumerWidget {
 
                         Row(
                           children: [
-                            Text(
-                              'sort by: ',
-                              style: Theme.of(context).textTheme.labelMedium!
-                                  .apply(color: EColors.textSecondary),
-                            ),
                             Consumer(
                               builder: (context, ref, child) {
-                                final orderByValue = ref.watch(orderProvider);
+                                final orderByValue = ref.watch(itemControllerProvider.select((S)=>S.order));
                                 // ref.watch(selectedChipProvider);
                                 return DropdownButton<OrderBy>(
                                   value: orderByValue,
@@ -76,7 +71,7 @@ class SortableList extends ConsumerWidget {
                                     DropdownMenuItem<OrderBy>(
                                       value: OrderBy.expiry,
                                       child: Text(
-                                        "Expiry",
+                                        'Expiry',
                                         style: Theme.of(context)
                                             .textTheme
                                             .labelLarge!
@@ -86,7 +81,7 @@ class SortableList extends ConsumerWidget {
                                     DropdownMenuItem<OrderBy>(
                                       value: OrderBy.added,
                                       child: Text(
-                                        "Added",
+                                        'Added',
                                         style: Theme.of(context)
                                             .textTheme
                                             .titleMedium!
@@ -96,7 +91,7 @@ class SortableList extends ConsumerWidget {
                                     DropdownMenuItem<OrderBy>(
                                       value: OrderBy.name,
                                       child: Text(
-                                        "Name",
+                                        'Name',
                                         style: Theme.of(context)
                                             .textTheme
                                             .titleMedium!
@@ -105,29 +100,11 @@ class SortableList extends ConsumerWidget {
                                     ),
                                   ],
                                   onChanged: (v) async {
-                                    final controller = ref.read(
-                                      orderProvider.notifier,
-                                    );
 
                                     if (v != null) {
-                                      ref
-                                              .read(
-                                                isItemsSortingProvider.notifier,
-                                              )
-                                              .state =
-                                          true;
-
-                                      controller.state = v;
-                                      await Future.delayed(
-                                        Duration(seconds: 1),
-                                      );
-
-                                      ref
-                                              .read(
-                                                isItemsSortingProvider.notifier,
-                                              )
-                                              .state =
-                                          false;
+                                       ref.read(
+                                        itemControllerProvider.notifier,
+                                      ).changeOrder(order: v);
                                     }
                                   },
                                 );
@@ -139,41 +116,6 @@ class SortableList extends ConsumerWidget {
                     ),
                   ),
                 ),
-                // SizedBox(width: 8),
-                // Container(
-                //   height: 56,
-                //   decoration: BoxDecoration(
-                //     // border: Border.all(),
-                //     color: Colors.white,
-                //     borderRadius: BorderRadius.circular(4),
-                //   ),
-                //   child: Consumer(
-                //     builder: (context, ref, child) {
-                //       final order = ref.watch(isOrderIncreasingProvider);
-                //
-                //       return InkWell(
-                //         onTap: () async {
-                //           ref.read(isItemsSortingProvider.notifier).state =
-                //               true;
-                //
-                //           final controller = ref.read(
-                //             isOrderIncreasingProvider.notifier,
-                //           );
-                //           controller.state = !order;
-                //           await Future.delayed(Duration(seconds: 1));
-                //           ref.read(isItemsSortingProvider.notifier).state =
-                //               false;
-                //         },
-                //         child: Icon(
-                //           order
-                //               ? Icons.arrow_upward_sharp
-                //               : Icons.arrow_downward_sharp,
-                //           color: EColors.primary,
-                //         ),
-                //       );
-                //     },
-                //   ),
-                // ),
               ],
             ),
           ),
@@ -186,19 +128,19 @@ class SortableList extends ConsumerWidget {
                 final currentSpace = ref.watch(currentSpaceProvider).value;
                 if(currentSpace==null) {
                   return SingleChildScrollView(
-                    physics: AlwaysScrollableScrollPhysics(),
+                    physics: const AlwaysScrollableScrollPhysics(),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Image.asset("assets/images/no_items_img.webp"),
+                        Image.asset('assets/images/no_items_img.webp'),
                         const SizedBox(height: 24),
                         Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16.0,
                           ),
                           child: Text(
-                            "No Items Found",
+                            'No Items Found',
                             style: Theme.of(context)
                                 .textTheme
                                 .headlineSmall!
@@ -215,7 +157,7 @@ class SortableList extends ConsumerWidget {
                             horizontal: 16.0,
                           ),
                           child: Text(
-                            "Try adjusting your search or add a new item to your list",
+                            'Try adjusting your search or add a new item to your list',
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium!
@@ -238,7 +180,7 @@ class SortableList extends ConsumerWidget {
                                 queryParameters: {},
                               );
                             },
-                            child: const Text("Add Item"),
+                            child: const Text('Add Item'),
                           ),
                         ),
                       ],
@@ -248,7 +190,7 @@ class SortableList extends ConsumerWidget {
                 return allItemsAsync.when(
                   data: (items) {
 
-                    final isLoading = ref.watch(isItemsSortingProvider);
+                    final isLoading = ref.watch(itemControllerProvider.select((s)=>s.isItemLoading));
                     final list = List<ItemModel>.from(items);
                     if (isLoading) {
                       return ListView.separated(
@@ -263,12 +205,12 @@ class SortableList extends ConsumerWidget {
                     }
                     return Consumer(
                       builder: (context, ref, child) {
-                        final toSearch = ref.watch(allItemsSearchText);
+                        final toSearch = ref.watch(itemControllerProvider.select((s)=>s.searchText));
 
                         final sortedList = list
                             .where(
                               (item) => item.name.toLowerCase().contains(
-                                toSearch.toLowerCase(),
+                                toSearch?.toLowerCase()??'',
                               ),
                             )
                             .toList();
@@ -278,19 +220,19 @@ class SortableList extends ConsumerWidget {
                               await ref.read(syncProvider).performManualSync();
                             },
                             child: SingleChildScrollView(
-                              physics: AlwaysScrollableScrollPhysics(),
+                              physics: const AlwaysScrollableScrollPhysics(),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Image.asset("assets/images/no_items_img.webp"),
+                                  Image.asset('assets/images/no_items_img.webp'),
                                   const SizedBox(height: 24),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 16.0,
                                     ),
                                     child: Text(
-                                      "No Items Found",
+                                      'No Items Found',
                                       style: Theme.of(context)
                                           .textTheme
                                           .headlineSmall!
@@ -307,7 +249,7 @@ class SortableList extends ConsumerWidget {
                                       horizontal: 16.0,
                                     ),
                                     child: Text(
-                                      "Try adjusting your search or add a new item to your list",
+                                      'Try adjusting your search or add a new item to your list',
                                       style: Theme.of(context)
                                           .textTheme
                                           .titleMedium!
@@ -330,7 +272,7 @@ class SortableList extends ConsumerWidget {
                                           queryParameters: {},
                                         );
                                       },
-                                      child: const Text("Add Item"),
+                                      child: const Text('Add Item'),
                                     ),
                                   ),
                                 ],

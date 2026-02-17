@@ -1,15 +1,15 @@
+import 'package:expiry_wise_app/features/Member/data/datasource/member_local_datasource_impl.dart';
 import 'package:expiry_wise_app/features/Member/data/models/member_model.dart';
+import 'package:expiry_wise_app/features/Member/data/repository/member_repository.dart';
+import 'package:expiry_wise_app/features/Space/presentation/controllers/spaceServices/space_services.dart';
 import 'package:expiry_wise_app/features/User/presentation/controllers/user_controller.dart';
 import 'package:expiry_wise_app/core/utils/snackbars/snack_bar_service.dart';
 import 'package:expiry_wise_app/features/Space/presentation/controllers/space_controller.dart';
 import 'package:expiry_wise_app/features/Space/data/model/space_model.dart';
 import 'package:expiry_wise_app/features/Space/data/repository/space_repository.dart';
 import 'package:expiry_wise_app/services/Connectivity/internet_connectivity.dart';
-import 'package:expiry_wise_app/services/local_db/sqflite_setup.dart';
-import 'package:expiry_wise_app/services/remote_db/fire_store_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-
 import '../../../User/data/models/user_model.dart';
 
 
@@ -47,8 +47,8 @@ class CurrentSpace extends AsyncNotifier<SpaceModel?> {
 
   Future<SpaceModel?> loadCurrentSpace() async {
     try {
-      final spaceController = ref.read(spaceControllerProvider.notifier);
-      return await spaceController.giveDefaultSpace();
+      final user = await ref.read(currentUserProvider.future);
+      return await ref.read(spaceUseCaseProvider).defaultSpaceUseCase(user: user);
     } catch (e) {
       rethrow;
     }
@@ -76,16 +76,8 @@ class CurrentSpace extends AsyncNotifier<SpaceModel?> {
 
   Future<void> _updateRole(SpaceModel space, UserModel user) async {
     try {
-      final isInternet =  ref.read(isInternetConnectedProvider);
-      MemberModel? currentMember;
-      if(user.userType=='google' && isInternet){
-       currentMember = await  ref.read(fireStoreServiceProvider).fetchSingleMemberFromSpace(spaceId: space.id, userId: user.id);
-        print('object    ${currentMember?.role}');
-      }
-      else{
+      final currentMember = await ref.read(memberRepoProvider).getSpaceMemberFromLocal(spaceId: space.id,userId: user.id);
 
-        currentMember = await ref.read(sqfLiteSetupProvider).fetchSingleMemberFromLocal(spaceId: space.id,userId: user.id);
-      }
       final currentProfile = ref.read(currentSpaceProfileProvider.notifier);
       if(currentMember==null){
         currentProfile.state = MemberRole.member;

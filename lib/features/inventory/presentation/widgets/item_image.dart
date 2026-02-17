@@ -1,4 +1,4 @@
-import 'package:expiry_wise_app/features/inventory/presentation/controllers/add_item_controllers/add_items_controller.dart';
+import 'package:expiry_wise_app/features/inventory/presentation/controllers/add_items_controller.dart';
 import 'package:expiry_wise_app/core/utils/helpers/image_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,7 +14,7 @@ class ItemImage extends ConsumerWidget {
       child: Container(
         height: MediaQuery.of(context).size.height*0.2,
         width: MediaQuery.of(context).size.width*0.8,
-        decoration: BoxDecoration(color: Colors.white),
+        decoration: const BoxDecoration(color: Colors.white),
         child: InkWell(
           onTap: () async {
             final XFile? photo = await ImagePicker().pickImage(
@@ -22,8 +22,8 @@ class ItemImage extends ConsumerWidget {
             );
 
             if (photo != null) {
-              ref.read(addItemStateProvider(id).notifier)
-                  .copyWith(image: photo.path);
+              ref.read(addItemStateProvider(id).notifier).copyWith(image: photo.path);
+
             }
           },
           child: Consumer(
@@ -37,7 +37,7 @@ class ItemImage extends ConsumerWidget {
               return Container(
                 clipBehavior: Clip.hardEdge,
 
-                decoration: BoxDecoration(color: Colors.white),
+                decoration: const BoxDecoration(color: Colors.white),
                 child: ImageHelper.giveImage(imagePath: selectedImg,imagePathNetwork: selectedImgNetwork)
               );
             },

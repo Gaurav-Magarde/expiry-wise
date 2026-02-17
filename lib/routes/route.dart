@@ -1,11 +1,11 @@
 import 'package:expiry_wise_app/features/inventory/presentation/screens/add_new_item/add_new_item_screen.dart';
 import 'package:expiry_wise_app/features/home/presentation/screens/inventory_status/all_status_screen.dart';
-import 'package:expiry_wise_app/features/inventory/presentation/screens/barcode_scanner/barcode_scan_screen.dart';
+import 'package:expiry_wise_app/features/inventory/presentation/screens/barcode_scan_screen.dart';
 import 'package:expiry_wise_app/features/inventory/presentation/screens/all_items/all_items_screen.dart';
 import 'package:expiry_wise_app/features/home/presentation/screens/home_screen.dart';
 import 'package:expiry_wise_app/features/inventory/presentation/screens/item_detail/item_detail_screen.dart';
 import 'package:expiry_wise_app/features/Member/presentation/screens/member_screen.dart';
-import 'package:expiry_wise_app/features/inventory/presentation/screens/quick_list/quick_list_screen.dart';
+import 'package:expiry_wise_app/features/quick_list/presentation/screens/quick_list_screen.dart';
 import 'package:expiry_wise_app/routes/presentation/screens/navigation_screen.dart';
 import 'package:expiry_wise_app/features/OnBoarding/presentation/screens/on_boarding_screen.dart';
 import 'package:expiry_wise_app/features/Profile/presentation/screens/profile_screen.dart';
@@ -17,6 +17,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/Member/presentation/screens/invite_member_screen.dart';
 import '../features/expenses/presentation/screens/edit_expense.dart';
+import '../features/voice_command/presentation/screens/bottom_sheet_voice_command.dart';
 
 class MYRoute {
   static GoRouter appRouter = GoRouter(
@@ -26,6 +27,11 @@ class MYRoute {
         name: 'memberScreen',
         path: '/memberScreen',
         builder: (context, state) => const MemberScreen(),
+      ),
+      GoRoute(
+        name: 'micScreen',
+        path: '/micScreen',
+        builder: (context, state) => const BottomSheetMic(),
       ),
       GoRoute(
         name: 'pantryStatusScreen',
@@ -60,7 +66,10 @@ class MYRoute {
       GoRoute(
         name: 'barcodeScanScreen',
         path: '/barcodeScanScreen',
-        builder: (context, state) => const BarcodeScanScreen(),
+        builder: (context, state) {
+          final id = state.uri.queryParameters['id'];
+          return  BarcodeScanScreen(id);
+        },
       ),
       GoRoute(
         name: 'addNewItemScreen',
@@ -144,4 +153,5 @@ class MYRoute {
   static const String quickListScreen = 'quickListScreen';
   static const String screenRedirect = 'screenRedirect';
   static String get navigationScreen => 'navigationScreen';
+  static String get micScreen => 'micScreen';
 }

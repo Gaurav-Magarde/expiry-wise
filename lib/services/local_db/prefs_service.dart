@@ -12,7 +12,7 @@ class PrefsService{
 
   Future<bool> get isUserFirstLogin async => await prefs.getBool("is_first_time")??false;
   Future<void>  setIsFirst( bool isFirst) async {
-    await prefs.setBool("is_first_time", isFirst);
+    await prefs.setBool('is_first_time', isFirst);
   }
 
   Future<String?> getString(String s) async {
@@ -22,14 +22,13 @@ class PrefsService{
   }
 
   Future<void> addString(String id) async {
-    prefs.setString("current_user_id", id);
+    prefs.setString('current_user_id', id);
   }
 
   Future<void> changeCurrentSpace(String currSpaceId)async{
     try{
-      print("reach");
 
-      await prefs.setString("current_space", currSpaceId);
+      await prefs.setString('current_space', currSpaceId);
     }catch(e){
       throw " ";
     }
@@ -46,12 +45,11 @@ class PrefsService{
   Future<void> clearAllPrefs() async {
 
     await PrefsService.prefs.clear(); // This deletes EVERYTHING
-    print("All shared preferences cleared");
   }
 
   Future<String?> getCurrentUserId() async {
     try{
-      return await prefs.getString("current_user_id");
+      return await prefs.getString('current_user_id');
     }catch(e){
       throw " ";
     }

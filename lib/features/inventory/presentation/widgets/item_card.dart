@@ -1,8 +1,8 @@
 import 'package:expiry_wise_app/core/utils/snackbars/snack_bar_service.dart';
 import 'package:expiry_wise_app/features/Member/data/models/member_model.dart';
 import 'package:expiry_wise_app/features/Space/presentation/controllers/current_space_provider.dart';
-import 'package:expiry_wise_app/features/inventory/data/models/item_model.dart';
-import 'package:expiry_wise_app/features/inventory/presentation/controllers/item_controller/item_controller.dart';
+import 'package:expiry_wise_app/features/inventory/domain/item_model.dart';
+import 'package:expiry_wise_app/features/inventory/presentation/controllers/item_controller.dart';
 import 'package:expiry_wise_app/routes/route.dart';
 import 'package:expiry_wise_app/core/utils/helpers/item_date_helper.dart';
 import 'package:expiry_wise_app/core/utils/helpers/image_helper.dart';
@@ -88,8 +88,8 @@ class ItemCard extends ConsumerWidget {
               addedDate: item.addedDate,
             );
             return await ref
-                .read(itemControllerProvider)
-                .insertItemFromFirebase(item: newItem, prev: item);
+                .read(itemControllerProvider.notifier)
+                .insertItemByItemModel(item: newItem, prev: item);
           } else {
             final current = ref.read(currentSpaceProfileProvider);
             if (current == MemberRole.member) {
@@ -102,13 +102,13 @@ class ItemCard extends ConsumerWidget {
               await showDialog(context: context, builder: (context){
 
                 return AlertBoxDeleteUser("Delete confirmation", () async {
-                   isDeleted = await ref.read(itemControllerProvider).deleteItem(item: item);
+                   isDeleted = await ref.read(itemControllerProvider.notifier).deleteItem(item: item);
                 if(context.mounted)context.pop();
                 }, "Item cannot be restored once deleted.Are you want to delete permanently");
               });
               return isDeleted;
             }else {
-              return ref.read(itemControllerProvider).deleteItem(item: item);
+              return ref.read(itemControllerProvider.notifier).deleteItem(item: item);
             }
           }
         },
@@ -209,23 +209,23 @@ class ItemCard extends ConsumerWidget {
                                   return;
                                 }
                                 ref
-                                    .read(itemControllerProvider)
+                                    .read(itemControllerProvider.notifier)
                                     .deleteItem(item: item);
                               }
                             },
                             itemBuilder: (context) => [
-                              PopupMenuItem(
+                              const PopupMenuItem(
                                 value: 'delete',
                                 child: Row(
                                   children: [
-                                    const Icon(
+                                    Icon(
                                       Icons.delete,
                                       color: Colors.red,
                                       size: 18,
                                     ),
-                                    const SizedBox(width: 8),
+                                    SizedBox(width: 8),
                                     Text(
-                                      "Delete",
+                                      'Delete',
                                       style: TextStyle(color: Colors.red),
                                     ),
                                   ],

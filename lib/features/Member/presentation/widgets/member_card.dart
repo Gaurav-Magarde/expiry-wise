@@ -2,9 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:expiry_wise_app/features/Member/presentation/controllers/member_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../../../core/theme/colors.dart';
 import '../../data/models/member_model.dart';
+
 
 class MemberCard extends ConsumerWidget {
   const MemberCard(this.member, this.userId, {super.key});
@@ -23,7 +23,7 @@ class MemberCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(5),
             offset: const Offset(0, 2),
             blurRadius: 6,
             spreadRadius: 0,
@@ -83,7 +83,7 @@ class MemberCard extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        member.userId == userId ? "You" : member.name,
+                        member.userId == userId ? 'You' : member.name,
                         style: Theme.of(context).textTheme.titleMedium!
                             .copyWith(
                               fontWeight: FontWeight.bold,
@@ -122,7 +122,7 @@ class MemberCard extends ConsumerWidget {
                 value: 'delete',
                 onTap: () async {
                   try{
-                    final controller = ref.read(memberStateProvider.notifier);
+                     final controller = ref.read(memberStateProvider.notifier);
                     await controller.removeMemberFromSpace(member: member);
                   }catch(e){}
                 },
@@ -147,14 +147,14 @@ class MemberCard extends ConsumerWidget {
                 },
                 child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.admin_panel_settings_outlined,
                       color: Colors.black87,
                       size: 20,
                     ),
                     const  SizedBox(width: 12),
                     Text(
-                      "Make $changeRoleTO",
+                      'Make $changeRoleTO',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ],

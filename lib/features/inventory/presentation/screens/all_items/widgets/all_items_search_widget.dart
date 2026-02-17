@@ -2,12 +2,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../controllers/item_controller/all_item_controller.dart';
+import '../../../controllers/all_item_controller.dart';
 class SearchWidget extends ConsumerStatefulWidget{
-  SearchWidget(this.controller, this.label, {super.key});
-  final TextEditingController _searchController = TextEditingController();
-  final controller;
-  final label;
+  const SearchWidget(this.onPressed,this.onChanged, this.label, {required this.searchController,super.key});
+  final TextEditingController searchController;
+  final  VoidCallback onPressed;
+  final  ValueChanged<String?> onChanged;
+  final String? label;
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
     return _SearchWidget();
@@ -19,17 +20,12 @@ class SearchWidget extends ConsumerStatefulWidget{
 
 class _SearchWidget extends ConsumerState<SearchWidget> {
    _SearchWidget();
-@override
-  void dispose() {
-    super.dispose();
-    widget._searchController.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       autofocus: true,
-      controller: widget._searchController,
+      controller: widget.searchController,
       style: const TextStyle(color: Colors.black, fontSize: 18),
       cursorColor: Colors.blueAccent,
       decoration: InputDecoration(
@@ -40,15 +36,10 @@ class _SearchWidget extends ConsumerState<SearchWidget> {
 
         suffixIcon: IconButton(
           icon: const Icon(Icons.close, color: Colors.grey),
-          onPressed: () {
-            widget._searchController.clear();
-            widget.controller.state = "";
-          },
+          onPressed: widget.onPressed,
         ),
       ),
-      onChanged: (val) {
-        widget.controller.state = val;
-      },
+      onChanged: widget.onChanged,
     );
   }
 }

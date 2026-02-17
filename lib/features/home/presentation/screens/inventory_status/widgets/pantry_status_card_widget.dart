@@ -40,7 +40,7 @@ class PantryStatusContainer extends ConsumerWidget {
             children: [
               // Header
               Text(
-                "Pantry Status",
+                'Pantry Status',
                 style: Theme.of(context).textTheme.titleMedium!.apply(
                   color: EColors.primaryDark,
                   fontWeightDelta: 3,

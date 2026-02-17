@@ -1,35 +1,52 @@
-import 'package:expiry_wise_app/features/inventory/data/models/category_helper_model.dart';
-import 'package:expiry_wise_app/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../controllers/item_controller/all_item_controller.dart';
+import 'package:expiry_wise_app/core/theme/colors.dart';
+// Adjust imports as needed
+import 'package:expiry_wise_app/features/inventory/data/models/category_helper_model.dart';
+import 'package:expiry_wise_app/features/inventory/presentation/controllers/item_controller.dart';
 
 class AllChips extends ConsumerWidget {
   const AllChips({super.key});
 
   @override
-  Widget build(BuildContext context, ref) {
+  Widget build(BuildContext context, WidgetRef ref) {
+
+    final selectedChip = ref.watch(itemControllerProvider.select((s) => s.selectedChip));
+
+    final List<String?> filterOptions = [null, ...ChipsModel.allChips];
+
     return SizedBox(
       height: 50,
-      child: ListView(
+      // 3. Use ListView.separated for clean spacing
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         scrollDirection: Axis.horizontal,
-        children: ChipsModel.allChips
-            .map(
-              (chip) => Consumer(
-                builder: (_, ref, _) {
-                  final selected = ref.watch(selectedChipProvider);
+        itemCount: filterOptions.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final category = filterOptions[index];
+          final isSelected = selectedChip == category;
 
-                  return Padding(
-                    padding:const EdgeInsets.symmetric(horizontal: 4),
-                    child: ChoiceChip(label: Text(chip.toUpperCase(),style: Theme.of(context).textTheme.labelMedium!.apply(color: selected==chip ? Colors.white:EColors.textSecondary),), selected: selected==chip,onSelected: (currSelected){
-                     if(currSelected) ref.read(selectedChipProvider .notifier).state = chip;
-                    },selectedColor: EColors.primary,backgroundColor: Colors.white,shape:const StadiumBorder(),showCheckmark: false, ),
-                  );
-                },
+          return ChoiceChip(
+            label: Text(
+              (category ?? 'All').toUpperCase(),
+              style: Theme.of(context).textTheme.labelMedium?.apply(
+                color: isSelected ? Colors.white : EColors.textSecondary,
+                fontWeightDelta: isSelected ? 2 : 0,
               ),
-            )
-            .toList(),
+            ),
+            selected: isSelected,
+            showCheckmark: false,
+            selectedColor: EColors.primary,
+            backgroundColor: Colors.white,
+            shape: const StadiumBorder(),
+            onSelected: (bool selected) {
+              if (selected) {
+                ref.read(itemControllerProvider.notifier).changeSelectedChip(selected: category);
+              }
+            },
+          );
+        },
       ),
     );
   }

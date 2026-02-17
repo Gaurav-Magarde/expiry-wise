@@ -8,20 +8,20 @@ class SpaceModel {
 
   Map<String, dynamic> getMap() {
     return {
-      "id": id,
-      "user_id": userId,
-      "name": name,
-      "is_synced": 0,
-      "is_deleted": 0,
+      'id': id,
+      'user_id': userId,
+      'name': name,
+      'is_synced': 0,
+      'is_deleted': 0,
       'updated_at':updatedAt
     };
   }
 
-  factory SpaceModel.fromMap({required Map<String, dynamic> map,required String userId}) {
-    return SpaceModel(updatedAt: map['updated_at']??'', userId: userId??map['admin'], name: map['name']??'', id: map['id']);
+  factory SpaceModel.fromMap({required Map<String, dynamic> map, String? userId}) {
+    return SpaceModel(updatedAt: map['updated_at']??'', userId: userId??'', name: map['name']??'', id: map['id']);
   }
 
    Map<String, dynamic> toMap() {
-    return {"user_id": userId, "name": name, "id": id,"updated_at": updatedAt};
+    return {'user_id': userId, 'name': name, 'id': id,'updated_at': updatedAt,'is_deleted':0};
   }
 }

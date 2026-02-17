@@ -17,14 +17,14 @@ class MemberModel {
 
   Map<String, dynamic> toMap() {
     return {
-      "photo": photo,
-      "name": name,
+      'photo': photo,
+      'name': name,
       'user_id': userId,
       'space_id': spaceID,
       'id': id,
       'role': role,
-      "is_synced": 0,
-      "is_deleted": 0,
+      'is_synced': 0,
+      'is_deleted': 0,
     };
   }
 

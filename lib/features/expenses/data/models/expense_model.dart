@@ -34,8 +34,8 @@ factory ExpenseModel.fromMap({required Map<String, dynamic> map}) {
     spaceId: map['space_id'],
     payerName: map['payer_name']??'',
     payerId: map['payer_id']??'',
-    title: map['title']??"",
-    id: map['id']??"",
+    title: map['title']??'',
+    id: map['id']??'',
     amount: map['amount']??0.0,
     category: ExpenseCategory.values.firstWhere((e)=>e.name==map['category'],orElse: ()=>ExpenseCategory.others),
     expenseDate: map['expense_date']??'',
@@ -55,7 +55,8 @@ Map<String,dynamic> toMap({String? isSynced}){
     'amount':amount,
     'category':category.name,
     'expense_date':expenseDate,
-    'updated_at':updatedAt
+    'updated_at':updatedAt,
+    'is_deleted': 0
 
   };
 }

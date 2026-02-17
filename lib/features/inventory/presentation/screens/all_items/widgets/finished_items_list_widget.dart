@@ -1,4 +1,5 @@
 import 'package:expiry_wise_app/core/widgets/shimmers/product_loading_listview.dart';
+import 'package:expiry_wise_app/features/inventory/presentation/controllers/item_controller.dart';
 import 'package:expiry_wise_app/features/inventory/presentation/screens/all_items/widgets/all_category_chips_widget.dart';
 import 'package:expiry_wise_app/features/inventory/presentation/widgets/item_card.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +10,8 @@ import '../../../../../../routes/route.dart';
 import '../../../../../../services/sync_services/local_firebase_syncing.dart';
 import '../../../../../../core/theme/colors.dart';
 import '../../../../../Space/presentation/controllers/current_space_provider.dart';
-import '../../../../data/models/item_model.dart';
-import '../../../controllers/item_controller/all_item_controller.dart';
+import '../../../../domain/item_model.dart';
+import '../../../controllers/all_item_controller.dart';
 
 class FinishedList extends ConsumerWidget {
   const FinishedList({super.key});
@@ -134,7 +135,7 @@ class FinishedList extends ConsumerWidget {
                 }
                 return allItemsAsync.when(
                   data: (items) {
-                    final isLoading = ref.watch(isItemsSortingProvider);
+                    final isLoading = ref.watch(itemControllerProvider.select((S)=>S.isItemLoading));
                     final list = List<ItemModel>.from(items);
                     if (isLoading) {
                       return ListView.separated(
@@ -149,12 +150,12 @@ class FinishedList extends ConsumerWidget {
                     }
                     return Consumer(
                       builder: (context, ref, child) {
-                        final toSearch = ref.watch(allItemsSearchText);
+                        final toSearch = ref.watch(itemControllerProvider.select((S)=>S.searchText));
 
                         final sortedList = list
                             .where(
                               (item) => item.name.toLowerCase().contains(
-                            toSearch.toLowerCase(),
+                            toSearch?.toLowerCase()??'',
                           ),
                         )
                             .toList();
@@ -164,7 +165,7 @@ class FinishedList extends ConsumerWidget {
                               await ref.read(syncProvider).performManualSync();
                             },
                             child: SingleChildScrollView(
-                              physics: AlwaysScrollableScrollPhysics(),
+                              physics: const AlwaysScrollableScrollPhysics(),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,

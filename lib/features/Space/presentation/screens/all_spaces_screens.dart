@@ -25,7 +25,7 @@ class AllSpacesScreens extends ConsumerWidget {
           //   child: TextButton(onPressed: (){}, child: Text("Add",style: Theme.of(context).textTheme.titleLarge,)),
           // )
         ],
-        title:const  Text("Spaces"),
+        title:const  Text('Spaces'),
       ),
       body: Padding(
         padding: const EdgeInsets.all( 8.0),
@@ -44,12 +44,12 @@ class AllSpacesScreens extends ConsumerWidget {
                         Image.asset('assets/images/img_5.webp'),
                         const SizedBox(height: 16),
                         Text(
-                          "No space Found!",style: Theme.of(context).textTheme.titleLarge!.apply(color: EColors.primaryDark,fontWeightDelta: 3),
+                          'No space Found!',style: Theme.of(context).textTheme.titleLarge!.apply(color: EColors.primaryDark,fontWeightDelta: 3),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          "Create a new space to start organising your items",style: Theme.of(context).textTheme.titleSmall!.apply(color: EColors.primaryDark,fontWeightDelta: 2),
+                          'Create a new space to start organising your items',style: Theme.of(context).textTheme.titleSmall!.apply(color: EColors.primaryDark,fontWeightDelta: 2),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -68,7 +68,7 @@ class AllSpacesScreens extends ConsumerWidget {
                   },
                 );
               },
-              error: (e, s) => const Text("error"),
+              error: (e, s) => const Text('error'),
               loading: () {
                 return const SpaceCardShimmer();
               },

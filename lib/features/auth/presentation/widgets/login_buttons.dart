@@ -15,7 +15,7 @@ class LoginButtons extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context,WidgetRef ref) {
-    final controller = ref.watch(loginStateProvider.notifier);
+    final controller = ref.watch(authControllerProvider.notifier);
     ref.watch(isLoginProvider.notifier);
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -31,7 +31,7 @@ class LoginButtons extends ConsumerWidget {
               isLoginController.state = true;
               await controller.continueWithGoogle();
             }catch(e){
-              SnackBarService.showError("google login failed");
+              SnackBarService.showError('google login failed');
             }finally{
               if(context.mounted) FullScreenLoader.stopLoader(context);
               isLoginController.state = false;
@@ -45,7 +45,7 @@ class LoginButtons extends ConsumerWidget {
                 child: Image.asset("assets/images/googleImg.png",),
               )),
 
-              Expanded(
+              const Expanded(
                 child: Text(
                   "Continue with Google",
                   textAlign: TextAlign.center,

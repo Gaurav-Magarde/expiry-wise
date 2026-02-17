@@ -42,7 +42,7 @@ class ApiProductModel {
       final String rawQuantity = (data['quantity'] ?? data['net_weight'] ?? "").toString();
 
 
-      final match = RegExp(r"([0-9]+(\.[0-9]+)?)").firstMatch(rawQuantity);
+      final match = RegExp(r'([0-9]+(\.[0-9]+)?)').firstMatch(rawQuantity);
 
       if (match != null) {
 

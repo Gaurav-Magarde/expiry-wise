@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:expiry_wise_app/features/inventory/presentation/controllers/item_controller/item_controller.dart';
-import 'package:expiry_wise_app/features/inventory/data/models/item_model.dart';
+import 'package:expiry_wise_app/features/inventory/presentation/controllers/item_controller.dart';
+import 'package:expiry_wise_app/features/inventory/domain/item_model.dart';
 import 'package:expiry_wise_app/core/constants/ApiKeys.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

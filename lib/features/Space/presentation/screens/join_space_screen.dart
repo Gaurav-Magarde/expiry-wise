@@ -22,6 +22,8 @@ class _JoinSpaceScreen extends ConsumerState<JoinSpaceScreen> {
     super.initState();
   }
 
+
+
   @override
   void dispose() {
     _editingController.dispose();
@@ -32,7 +34,7 @@ class _JoinSpaceScreen extends ConsumerState<JoinSpaceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text("Join A New Space")),
+      appBar: AppBar(title: const Text('Join A New Space')),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 32),
@@ -55,19 +57,18 @@ class _JoinSpaceScreen extends ConsumerState<JoinSpaceScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                "Enter the invite code shared by your admin to collaborate",
+                'Enter the invite code shared by your admin to collaborate',
                 style: Theme.of(context).textTheme.titleMedium,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
-
               TextFormFieldWidget(
                 controller: _editingController,
                 onChanged: (v) {
                   ref.read(joinCodeTextProvider.notifier).state = v;
                 },
-                hint: "Enter code here",
-                labelText: "joining code",
+                hint: 'Enter code here',
+                labelText: 'joining code',
                 prefixIcon: const Icon(Icons.mail_outline),
               ),
               const SizedBox(height: 24),
@@ -85,16 +86,16 @@ class _JoinSpaceScreen extends ConsumerState<JoinSpaceScreen> {
                   builder: (_, ref, __) {
                     final isJoining = ref.watch(isSpaceJoining);
                     if (isJoining) {
-                      return Row(
+                      return const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Joining..."),
-                          const SizedBox(width: 16),
-                          const CircularProgressIndicator(color: Colors.white,),
+                          Text('Joining...'),
+                          SizedBox(width: 16),
+                          CircularProgressIndicator(color: Colors.white,),
                         ],
                       );
                     } else {
-                      return const Text("Join Space");
+                      return const Text('Join Space');
                     }
                   },
                 ),

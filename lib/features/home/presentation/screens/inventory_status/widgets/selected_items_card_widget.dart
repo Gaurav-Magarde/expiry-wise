@@ -2,7 +2,7 @@ import 'package:expiry_wise_app/core/widgets/shimmers/product_loading_listview.d
 import 'package:expiry_wise_app/features/inventory/presentation/widgets/item_card.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../../inventory/data/models/item_model.dart';
+import '../../../../../inventory/domain/item_model.dart';
 
 class SelectedItemsCardWidget extends StatelessWidget {
 
@@ -19,7 +19,7 @@ class SelectedItemsCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white
       ),
       child: Column(

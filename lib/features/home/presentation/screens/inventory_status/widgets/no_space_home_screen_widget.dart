@@ -20,7 +20,7 @@ class NoSpaceHomeScreenWidget extends ConsumerWidget{
         const SizedBox(height: 16,),
         ElevatedButton(onPressed: (){
           context.pushNamed(MYRoute.spaceScreen);
-        }, child: Text('create new space'))
+        }, child: const Text('create new space'))
       ],
     );
 

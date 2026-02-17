@@ -2,7 +2,7 @@ import 'package:expiry_wise_app/features/home/presentation/controllers/home_cont
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../../inventory/data/models/item_model.dart';
+import '../../../../../inventory/domain/item_model.dart';
 
 class DetailCard extends ConsumerWidget {
   const DetailCard(

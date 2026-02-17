@@ -604,7 +604,7 @@ class ProfileScreen extends ConsumerWidget {
                   showDialog(
                     context: context,
                     builder: (_) => AlertBoxDeleteUser(
-                      "Delete Account?",
+                      'Delete Account?',
                       () async {
                         FullScreenLoader.showLoader(
                           context,
@@ -619,7 +619,7 @@ class ProfileScreen extends ConsumerWidget {
                             FullScreenLoader.stopLoader(context);
                             context.pop();
                           }
-                          ref.read(screenRedirectProvider).screenRedirect();
+                          // ref.read(screenRedirectProvider).screenRedirect();
                         } catch (e) {
                           if (context.mounted) {
                             FullScreenLoader.stopLoader(context);
@@ -636,7 +636,7 @@ class ProfileScreen extends ConsumerWidget {
                   );
                 },
                 child: Text(
-                  "Delete Account",
+                  'Delete Account',
                   style: Theme.of(
                     context,
                   ).textTheme.titleMedium!.apply(color: Colors.redAccent),
@@ -650,7 +650,7 @@ class ProfileScreen extends ConsumerWidget {
   }
 }
 
-_loginButtonHelper(WidgetRef ref, context) async {
+Future<void> _loginButtonHelper(WidgetRef ref, context) async {
   final currentUser = ref.read(currentUserProvider).value;
   if (currentUser == null || currentUser.id.isEmpty) {
     SnackBarService.showError('user not found!');
@@ -668,7 +668,7 @@ _loginButtonHelper(WidgetRef ref, context) async {
     }
   } else if (currentUser.userType == 'guest') {
     try {
-      final loginController = ref.read(loginStateProvider.notifier);
+      final loginController = ref.read(authControllerProvider.notifier);
       await loginController.continueWithGoogle();
     } catch (e) {
       SnackBarService.showError('login failed!');

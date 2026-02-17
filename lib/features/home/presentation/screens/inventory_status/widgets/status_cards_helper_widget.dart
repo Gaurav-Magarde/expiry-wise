@@ -10,12 +10,12 @@ class CardsHelperWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return const Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         DetailCard(
-          const LinearGradient(
+          LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
@@ -27,9 +27,9 @@ class CardsHelperWidget extends StatelessWidget {
           'Expired',
           SelectedContainer.expired,
         ),
-        const SizedBox(width: 16),
+        SizedBox(width: 16),
         DetailCard(
-          const LinearGradient(
+          LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
@@ -41,9 +41,9 @@ class CardsHelperWidget extends StatelessWidget {
           'Expiring soon',
           SelectedContainer.expiring,
         ),
-        const SizedBox(width: 16),
+        SizedBox(width: 16),
         DetailCard(
-          const LinearGradient(
+          LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [

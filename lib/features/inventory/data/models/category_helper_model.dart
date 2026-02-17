@@ -92,7 +92,6 @@ extension CategoryDetails on ItemCategory {
 class ChipsModel{
   static List<String> get  allChips {
     List<String> list =  ItemCategory.values.map((cate)=>cate.name).toList();
-    list.insert(0,'all');
     return list;
   }
 

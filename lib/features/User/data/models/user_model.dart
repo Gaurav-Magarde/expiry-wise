@@ -15,19 +15,19 @@ class UserModel {
   final String photoUrl;
 
   factory UserModel.empty() {
-    return UserModel(updatedAt:'',photoUrl: "", userType: "", name: "", email: "", id: "");
+    return UserModel(updatedAt:'',photoUrl: '', userType: '', name: '', email: '', id: '');
   }
 
   Map<String, Object?> toMap() {
     return {
       'updated_at':updatedAt,
-      "name": name,
-      "email": email,
-      "id": id,
-      "user_type": userType,
+      'name': name,
+      'email': email,
+      'id': id,
+      'user_type': userType,
       'photo_url': photoUrl,
-      "is_synced" : 0,
-      "is_deleted" : 0
+      'is_synced' : 0,
+      'is_deleted' : 0
     };
   }
 

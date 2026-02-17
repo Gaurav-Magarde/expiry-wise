@@ -20,9 +20,9 @@ class _ExpensePieChartState extends State<ExpensePieChart> {
     final categoryTotals = _processData();
     final totalExpense = widget.expenses.fold(0.0, (sum, item) => sum + item.amount);
 
-    // if (totalExpense == 0) {
-    //   return SizedBox(height: 200, child: Center(child: Text("No expenses yet!")));
-    // }
+    if (totalExpense == 0) {
+      return SizedBox(height: 200, child: Center(child: Text("No expenses yet!")));
+    }
 
     return Card(
       elevation: 4,
@@ -31,8 +31,8 @@ class _ExpensePieChartState extends State<ExpensePieChart> {
       color: Colors.white,
       child: Column(
         children: [
-          SizedBox(height: 20),
-          Text("Monthly Spending", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 20),
+          const Text('Monthly Spending', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           SizedBox(
             height: 250, // Chart ki height
             child: Stack(
@@ -64,10 +64,10 @@ class _ExpensePieChartState extends State<ExpensePieChart> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(touchedIndex==-1? "Total":widget.expenses[touchedIndex].category.name, style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      Text(touchedIndex==-1? 'Total':widget.expenses[touchedIndex].category.name, style: TextStyle(fontSize: 12, color: Colors.grey)),
                       Text(
-                        touchedIndex==-1? "₹${totalExpense.toStringAsFixed(0)}":Helper.formatCurrency(widget.expenses[touchedIndex].amount),
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                        touchedIndex==-1? '₹${totalExpense.toStringAsFixed(0)}':Helper.formatCurrency(widget.expenses[touchedIndex].amount),
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
                       ),
                     ],
                   ),
@@ -132,7 +132,7 @@ class _ExpensePieChartState extends State<ExpensePieChart> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(width: 12, height: 12, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-        SizedBox(width: 4),
+        const SizedBox(width: 4),
         Text(title, style: TextStyle(fontSize: 12, color: Colors.grey[700])),
       ],
     );

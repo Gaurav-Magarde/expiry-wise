@@ -1,14 +1,28 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expiry_wise_app/features/Member/data/datasource/member_local_datasource_impl.dart';
+import 'package:expiry_wise_app/features/Member/data/datasource/member_remote_datasource_impl.dart';
+import 'package:expiry_wise_app/features/Member/data/datasource/member_remote_datasource_interface.dart';
 import 'package:expiry_wise_app/features/Member/data/models/member_model.dart';
+import 'package:expiry_wise_app/features/Member/data/repository/member_repository.dart';
+import 'package:expiry_wise_app/features/Space/data/datasource/space_local_data_source.dart';
 import 'package:expiry_wise_app/features/Space/data/model/space_model.dart';
-import 'package:expiry_wise_app/features/inventory/data/models/item_model.dart';
-import 'package:expiry_wise_app/features/inventory/presentation/controllers/item_controller/item_controller.dart';
+import 'package:expiry_wise_app/features/Space/data/repository/space_repository.dart';
+import 'package:expiry_wise_app/features/User/domain/user_repository_interface.dart';
+import 'package:expiry_wise_app/features/User/presentation/controllers/services.dart';
+import 'package:expiry_wise_app/features/inventory/data/datasource/inventory_remote_datasource_impl.dart';
+import 'package:expiry_wise_app/features/inventory/data/datasource/inventory_remote_datasource_inteface.dart';
+import 'package:expiry_wise_app/features/inventory/data/repository/item_repository_impl.dart';
+import 'package:expiry_wise_app/features/inventory/domain/inventory_repository.dart';
+import 'package:expiry_wise_app/features/inventory/domain/item_model.dart';
+import 'package:expiry_wise_app/routes/presentation/controllers/route_controller.dart';
 import 'package:expiry_wise_app/services/local_db/prefs_service.dart';
 import 'package:expiry_wise_app/services/local_db/sqflite_setup.dart';
 import 'package:expiry_wise_app/services/notification_services/local_notification_service.dart';
 import 'package:expiry_wise_app/services/remote_db/fire_store_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -19,42 +33,8 @@ import '../../../../core/utils/exception/firebase_auth_exceptions.dart';
 import '../../../../core/utils/exception/firebase_exceptions.dart';
 import '../../../../core/utils/exception/format_exceptions.dart';
 import '../../../../core/utils/exception/platform_exceptions.dart';
+import '../../../Member/data/datasource/member_local_datasource_interface.dart';
 import '../../data/models/user_model.dart';
-
-final userRepoProvider = Provider<UserRepository>((ref) {
-  final fireStoreService = ref.read(fireStoreServiceProvider);
-
-  return UserRepository(ref, fireStoreService);
-});
-
-class UserRepository {
-  final SqfLiteSetup _sqfLite;
-  final PrefsService _prefs;
-  final FireStoreService _fireStoreService;
-
-  UserRepository(Ref ref, this._fireStoreService)
-    : _sqfLite = ref.read(sqfLiteSetupProvider),
-      _prefs = ref.read(prefsServiceProvider);
-
-  Future<void> saveUserLocally({required UserModel user}) async {
-    try {
-      await _sqfLite.insertUser(user);
-    } on FirebaseAuthException catch (e){
-      throw TFirebaseAuthException(e.code).message;
-    } on PlatformException catch (e){
-      throw TPlatformException(e.code).message;
-    } on FormatException catch (e){
-      throw TFormatException(e.message).message;
-    } on FirebaseException catch (e){
-      throw TFirebaseException(e.code).message;
-    }on Exception {
-      throw TExceptions().message;
-    }catch (e){
-      throw 'some went wrong';
-    }
-  }
-
-}
 
 final currentUserProvider = AsyncNotifierProvider(() {
   return CurrentUser();
@@ -62,79 +42,74 @@ final currentUserProvider = AsyncNotifierProvider(() {
 
 class CurrentUser extends AsyncNotifier<UserModel?> {
   CurrentUser();
-  late SqfLiteSetup _sqfLite;
   late PrefsService _prefs;
-  late FireStoreService _fireStoreService;
-  late String? currentLoggedUser;
+  late IUserRepository userRepository;
   @override
   Future<UserModel> build() async {
-    try {
 
-      _fireStoreService = ref.read(fireStoreServiceProvider);
+    try{
       _prefs = ref.read(prefsServiceProvider);
-      _sqfLite = ref.read(sqfLiteSetupProvider);
-      currentLoggedUser = FirebaseAuth.instance.currentUser?.uid;
-
+      userRepository = ref.read(userRepoProvider);
+      final currentLoggedUser = userRepository.currentLoggedInUser;
       if (currentLoggedUser != null) {
-
-        final userFromDb = await _sqfLite.getUserFromId(currentLoggedUser!);
-
+        final userFromDb = await userRepository.getUserFromIdLocal(
+          userId: currentLoggedUser
+        );
         if (userFromDb != null) {
           return userFromDb;
         }
       }
-
       final currentUserId = await _prefs.getCurrentUserId();
-
       if (currentUserId == null) {
-
         return UserModel.empty();
       }
-
-      final userFromDb = await _sqfLite.getUserFromId(currentUserId);
-
+      final userFromDb = await userRepository.getUserFromIdLocal(
+        userId: currentUserId,
+      );
+      if(kDebugMode){
+        print('user from db $currentUserId ${userFromDb?.toMap()}userFromDb');
+      }
       if (userFromDb != null) {
-
         // ref.read(apiImageProvider).startSmartSync();
         // ref.read(firebaseStreamProvider).startAllListeners(userFromDb.id);
+
         return userFromDb;
       }
 
       return UserModel.empty();
-    } on FirebaseAuthException catch (e){
+    } on FirebaseAuthException catch (e) {
       throw TFirebaseAuthException(e.code).message;
-    } on PlatformException catch (e){
+    } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
-    } on FormatException catch (e){
+    } on FormatException catch (e) {
       throw TFormatException(e.message).message;
-    } on FirebaseException catch (e){
+    } on FirebaseException catch (e) {
       throw TFirebaseException(e.code).message;
-    }on Exception {
+    } on Exception {
       throw TExceptions().message;
-    }catch (e){
+    } catch (e) {
       throw 'some went wrong';
     }
   }
 
   Future<void> saveUserLocally({required UserModel user}) async {
-    try {
-      await _sqfLite.insertUser(user);
+    try{
+      await userRepository.saveUserLocally(user: user);
       state = AsyncData(user);
-    } on FirebaseAuthException catch (e){
+    } on FirebaseAuthException catch (e) {
       throw TFirebaseAuthException(e.code).message;
-    } on PlatformException catch (e){
+    } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
-    } on FormatException catch (e){
+    } on FormatException catch (e) {
       throw TFormatException(e.message).message;
-    } on FirebaseException catch (e){
+    } on FirebaseException catch (e) {
       throw TFirebaseException(e.code).message;
-    }on Exception {
-      throw TExceptions().message;
-    }catch (e){
+    } on Exception {
+      throw const TExceptions().message;
+    } catch (e) {
       throw 'some went wrong';
     }
   }
-
 
   void copyWith({
     final String? name,
@@ -154,130 +129,70 @@ class CurrentUser extends AsyncNotifier<UserModel?> {
     );
   }
 
-  Future<UserModel?> loadUserOnLogin(String id,String email) async {
+  Future<UserModel?> loadUserOnLogin(String id, String email) async {
     try {
-      final isInternet = ref.read(isInternetConnectedProvider);
-      final isNotify = await _prefs.getIsNotificationOn();
-      if(!isInternet) {
-        SnackBarService.showMessage("Please check your internet connection");
-        return null;
-      }
-      print('A');
-      final user = await _fireStoreService.getUserDetail(id);
-      print('A');
-      if (user == null){
-        return null;
-      }
-
-      print('A');
-      await _sqfLite.insertUser(user);
-      print('A');
-
-      List<SpaceModel> spaces = await _fireStoreService.fetchSpacesFromUser(id);
-      print('A');
-
-      for (var space in spaces) {
-      print('a');
-
-
-        await _sqfLite.createSpace(space: space);
-
-        List members = await _fireStoreService.fetchMembersFromSpace(
-          spaceId: space.id,
-        );
-      print('b');
-
-        for (MemberModel mem in members) {
-      print('B');
-          final newM = MemberModel(
-            role: mem.role,
-            name: mem.name,
-            spaceID: mem.spaceID,
-            id: mem.id,
-            userId: mem.userId,
-            photo: mem.photo,
-          );
-      print('#@');
-          await _sqfLite.addMemberToMembers(member: newM);
-        }
-      print('#');
-
-        List<ItemModel> items = await _fireStoreService.fetchAllItemsFirebase(
-          user.id,
-          space.id,
-        );
-      print('C');
-          await _sqfLite.insertItems(  items);
-      print('c');
-        for (ItemModel item in items) {
-      print('D');
-           if(isNotify) ref.read(notificationServiceProvider).scheduleNotificationFor(item).catchError((e){});
-        }
-        await _sqfLite.markSpaceAsSynced(space.id);
-      }
-      print('E');
-      if(state.hasValue && state.value!=null){
-        await _sqfLite.changeUserIdOnTransaction(oldId:state.value!.id,newUser : user,email: email);
-      }
-      print('E');
+      final user = await ref
+          .read(userServiceProvider)
+          .loadUserOnLogin(id, email);
       state = AsyncData(user);
 
       return user;
-    } on FirebaseAuthException catch (e){
+    } on FirebaseAuthException catch (e) {
       throw TFirebaseAuthException(e.code).message;
-    } on PlatformException catch (e){
+    } on PlatformException catch (e) {
       throw TPlatformException(e.code).message;
-    } on FormatException catch (e){
+    } on FormatException catch (e) {
       throw TFormatException(e.message).message;
-    } on FirebaseException catch (e){
+    } on FirebaseException catch (e) {
       throw TFirebaseException(e.code).message;
-    }on Exception {
+    } on Exception {
       throw TExceptions().message;
-    }catch (e){
+    } catch (e) {
       throw 'some went wrong';
     }
   }
 
   Future<void> fetchNewName(String userId) async {
     try {
-      final isInternet = ref.read(isInternetConnectedProvider);
-      if(!isInternet) {
-        SnackBarService.showMessage("Please connect to the internet");
-        return;
-      }
-      final newUser = await _fireStoreService.getUserDetail(userId);
+      final newUser = await userRepository.getUserDetailRemote(id: userId);
       if (newUser == null) {
-        SnackBarService.showMessage("something went wrong");
+        SnackBarService.showMessage('user not found');
 
         return;
       }
       if (state.value == null) {
-        SnackBarService.showMessage("something went wrong");
+        SnackBarService.showMessage('something went wrong');
         return;
-      }
-      else{
+      } else {
         state = AsyncData(state.value!.copyWith(name: newUser.name));
       }
-    } on FirebaseAuthException catch (e){
-      throw TFirebaseAuthException(e.code).message;
-    } on PlatformException catch (e){
-      throw TPlatformException(e.code).message;
-    } on FormatException catch (e){
-      throw TFormatException(e.message).message;
-    } on FirebaseException catch (e){
-      throw TFirebaseException(e.code).message;
-    }on Exception {
-      throw TExceptions().message;
-    }catch (e){
-      throw 'some went wrong';
+    } catch (e) {
+      SnackBarService.showError('some thing went wrong ${e.toString()}');
     }
   }
-}
 
-final loggedInUserProvider = StreamProvider<String?>((ref) async* {
-  String? user;
-  await for (final firebaseUser in FirebaseAuth.instance.authStateChanges()) {
-    user = firebaseUser?.uid;
-    yield user;
+  Future<void> changeName(newName) async {
+    try {
+      final user = ref.read(currentUserProvider).value;
+      await ref.read(userServiceProvider).changeName(newName: newName, user: user);
+      ref.invalidate(currentUserProvider);
+    } catch (e) {
+      SnackBarService.showError('Name changed failed ');
+    }
   }
-});
+
+  Future<void> toggleAutoSync(bool autoSync) async {
+    final user = ref.read(currentUserProvider).value;
+    if (user == null || user.id.isEmpty) {
+      throw Exception('user not found');
+      return;
+    }
+    if (user.userType == 'guest') {
+     throw Exception(
+        'please login first to auto sync the items!',
+      );
+    }
+    final prefs = ref.read(prefsServiceProvider);
+    await prefs.setAutoSync(autoSync);
+  }
+}

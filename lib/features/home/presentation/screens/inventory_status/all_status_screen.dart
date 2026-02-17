@@ -10,7 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../services/sync_services/local_firebase_syncing.dart';
-import '../../../../inventory/data/models/item_model.dart';
+import '../../../../inventory/domain/item_model.dart';
 import 'widgets/selected_items_card_widget.dart';
 import 'widgets/status_cards_helper_widget.dart';
 class PantryStatusScreen extends ConsumerWidget{
@@ -20,7 +20,7 @@ class PantryStatusScreen extends ConsumerWidget{
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: Text("Pantry Status"),),
+      appBar: AppBar(title: const Text('Pantry Status'),),
       body: RefreshIndicator(
 
         onRefresh: () async{
@@ -69,12 +69,12 @@ class PantryStatusScreen extends ConsumerWidget{
                                   Image.asset('assets/images/no_items_img.webp'),
                                   const SizedBox(height: 16),
                                   Text(
-                                    "No $name items Found!",style: Theme.of(context).textTheme.titleLarge!.apply(color: EColors.primaryDark,fontWeightDelta: 3),
+                                    'No $name items Found!',style: Theme.of(context).textTheme.titleLarge!.apply(color: EColors.primaryDark,fontWeightDelta: 3),
                                     textAlign: TextAlign.center,
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    "Start adding items to track their expiry",style: Theme.of(context).textTheme.titleSmall!.apply(color: EColors.primaryDark,fontWeightDelta: 2),
+                                    'Start adding items to track their expiry',style: Theme.of(context).textTheme.titleSmall!.apply(color: EColors.primaryDark,fontWeightDelta: 2),
                                     textAlign: TextAlign.center,
                                   ),
                                 ],
@@ -83,7 +83,7 @@ class PantryStatusScreen extends ConsumerWidget{
                           );
                         },
                       );
-                    }, error: (e,s)=>Text('error'),  loading: ()=>Center(child: CircularProgressIndicator(),));
+                    }, error: (e,s)=>const Text('error'),  loading: ()=>const Center(child: CircularProgressIndicator(),));
                   },
                 ),
                 const SizedBox(height: 36),

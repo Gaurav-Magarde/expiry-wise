@@ -41,15 +41,13 @@ class _AddSpaceFloatingButton extends ConsumerState<AddSpaceFloatingButton> {
           builder: (c) {
             return AlertDialog(
               elevation: 1,
-              title: Text("Add New Space",style: Theme.of(context).textTheme.titleMedium!.apply(color: EColors.accentPrimary),),
+              title: Text('Add New Space',style: Theme.of(context).textTheme.titleMedium!.apply(color: EColors.accentPrimary),),
               content: TextFormFieldWidget(
                 labelText: 'Space Name',
                 controller: widget._controller,
-                onChanged: (v) {
-                  ref.read(spaceNameProvider.notifier).state = v;
-                },
+
                 prefixIcon: const Icon(Icons.store_mall_directory_sharp),
-                hint: "eg. Home Space",
+                hint: 'eg. Home Space',
               ),
               actions: [
                 SizedBox(
@@ -78,6 +76,7 @@ class _AddSpaceFloatingButton extends ConsumerState<AddSpaceFloatingButton> {
                                   final controller = ref.read(
                                     spaceControllerProvider.notifier,
                                   );
+                                  ref.read(spaceNameProvider.notifier).state = widget._controller.text;
                                   final isDone = await controller.addNewSpace();
                                   if(!isDone) return;
                                   if (context.mounted) {
