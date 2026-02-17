@@ -1,79 +1,73 @@
 <div align="center">
 
-# 🍎 Expiry Wise
-**Smart Food Inventory & Expiry Tracker**
+# 🍎 ExpiryWise
+**Smart Inventory & Expiry Tracker (Offline-First)**
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.0%2B-02569B?logo=flutter)](https://flutter.dev/)
-[![Dart](https://img.shields.io/badge/Dart-3.0%2B-0175C2?logo=dart)](https://dart.dev/)
-[![State Management](https://img.shields.io/badge/State%20Management-Riverpod-purple)]()
-[![Database](https://img.shields.io/badge/Database-SQLite%20%2B%20Firestore-orange)]()
+[![State Management](https://img.shields.io/badge/State-Riverpod-purple)]()
+[![Architecture](https://img.shields.io/badge/Arch-Clean%20Architecture-green)]()
+[![Sync Engine](https://img.shields.io/badge/Sync-WorkManager%20%2B%20SQLite-orange)]()
 
-<p>
-  <b>Expiry Wise</b> is a smart mobile application designed to reduce food waste and manage household inventory efficiently. 
-  It features an <b>Offline-First Architecture</b> using SQL and Firestore to ensure seamless performance even without internet.
-  <br>
-  Packed with <b>Barcode Scanning, Family Sync, and Smart Alerts</b>.
+<p align="center">
+  <b>ExpiryWise</b> helps reduce food waste by tracking inventory expiry dates. 
+  Built with a robust <b>Offline-First Architecture</b>, it saves data locally using SQLite and syncs with Firebase in the background using WorkManager, ensuring the app works perfectly even without an internet connection.
 </p>
 
 </div>
 
 ---
 
-## 📱 App Gallery
+## 📱 App Overview
 
-A glimpse of the app's UI and key functionalities.
+A visual tour of ExpiryWise features.
 
-| Home & Notifications | Add Item (Scanner) | Item Details |
-|:--------------------:|:------------------:|:------------:|
-| <img src="screenshots/1_home.png" width="250"> | <img src="screenshots/2_add.png" width="250"> | <img src="screenshots/3_detail.png" width="250"> |
-| **Dashboard & Alerts** | **Scan Barcode & Add** | **Edit & Manage Items** |
+|              **1. Smart Dashboard**               |               **2. AI & Scan Entry**               |              **3. Inventory Tracker**               |
+|:-------------------------------------------------:|:--------------------------------------------------:|:---------------------------------------------------:|
+| <img src="screenshots/1_dashboard.jpg" width="250"> | <img src="screenshots/2_add_item.jpg" width="250"> | <img src="screenshots/3_inventory.jpg" width="250"> |
+|           **Visual Analytics & Alerts**           |            **Voice Command & Barcode**             |               **Filter by Freshness**               |
 
-| Inventory (Filter View) | User Profile & Settings | Collaborative Space |
-|:-----------------------:|:-----------------------:|:-------------------:|
-| <img src="screenshots/4_inventory_split.png" width="250"> | <img src="screenshots/5_profile_split.png" width="250"> | <img src="screenshots/6_space_split.png" width="250"> |
-| **Search & Sort Logic** | **Profile Management** | **Invite & Join Family** |
-
+|               **4. Expense Manager**               |                 **5. Quick Lists**                  |                **6. User Profile**                |
+|:--------------------------------------------------:|:---------------------------------------------------:|:-------------------------------------------------:|
+| <img src="screenshots/4_expenses.jpg" width="250"> | <img src="screenshots/5_quicklist.jpg" width="250"> | <img src="screenshots/6_profile.jpg" width="250"> |
+|              **Track Food Spending**               |             **Fast Access Essentials**              |            **Sync Status & Settings**             |
 ---
 
 ## ✨ Key Features
 
-### 📡 Offline-First Architecture (New!)
-* **Hybrid Database:** Uses **SQLite** for robust local storage and **Firebase Firestore** for cloud syncing.
-* **Works Everywhere:** The app is fully functional offline. Data syncs automatically when the internet is restored.
+✅ **Offline-First Design**
+The app relies on **SQLite** for all immediate actions. You can add, edit, or delete items while offline. Data is synced to the cloud (Firebase) automatically when the internet restores.
 
-### 📸 Barcode Scanner
-* **Quick Entry:** Scan product barcodes to auto-fill details instantly. No manual typing required.
+✅ **Background Synchronization**
+Implemented a custom sync engine using **WorkManager**. It runs periodically in the background to push local changes to the server and keep data consistent without opening the app.
 
-### 🛒 Smart Inventory Tracking
-* **Visual Indicators:** Color-coded alerts—**Red** (Expired), **Orange** (Expiring Soon), **Green** (Fresh).
-* **Sort & Filter:** Advanced sorting logic to find items by Category (Dairy, Veggies) or Expiry Date.
+✅ **AI-Powered Entry (Gemini)**
+Integrated **Google Gemini AI** for smart entry. Instead of typing manually, you can use voice commands (e.g., *"Milk, Bread, and Eggs"*) to auto-fill item details.
 
-### 🔔 Smart Notifications
-* **Local & Push Alerts:** Get notified before an item expires to ensure timely usage.
-* **Dashboard Summary:** Quick view of "Items Expiring Today" directly on the Home Screen.
+✅ **Smart Notifications**
+Local notification system that alerts you before items expire (Today, Tomorrow, or Soon) so food doesn't go to waste.
 
-### 🤝 Family Sync (Real-time)
-* **Collaborative Spaces:** Invite family members to your space via a unique code.
-* **Live Updates:** Changes made by one member reflect instantly across all devices.
+✅ **Family & Space Management**
+Create shared "Spaces" and invite family members. Inventory is synced across all devices so everyone stays updated.
 
-### ⚡ Optimization & Performance
-* **Memory Efficient:** Implemented `cacheWidth` for image optimization.
-* **Leak Free:** Uses Riverpod's `autoDispose` to manage state and memory efficiently.
+✅ **Barcode Scanner**
+Built-in scanner to quickly add packaged products.
 
 ---
 
 ## 🛠️ Tech Stack
 
-* **Framework:** [Flutter](https://flutter.dev/)
-* **Language:** Dart
-* **State Management:** Riverpod State management
-* **Databases:** * **SQLite (sqflite):** For offline persistence and fast local access.
-    * **Firebase Firestore:** For backend syncing and real-time updates.
-* **Key Packages:** `mobile_scanner`, `icons_plus`, `cached_network_image`, `flutter_local_notifications`.
+* **Framework:** Flutter (Dart)
+* **State Management:** Riverpod
+* **Architecture:** Clean Architecture + MVVM
+* **Local Database:** `sqflite` (SQLite)
+* **Backend:** Firebase Firestore (Cloud Storage) & Auth
+* **Background Tasks:** `workmanager` (Android/iOS background fetch)
+* **AI Integration:** Google Generative AI (Gemini)
+* **Notifications:** `flutter_local_notifications`
 
 ---
 
-## 🚀 How to Run Locally
+## 🚀 How to Run
 
 1.  **Clone the project**
     ```bash
@@ -87,7 +81,7 @@ A glimpse of the app's UI and key functionalities.
     ```
 
 3.  **Firebase Setup**
-    * Add your `google-services.json` (Android).
+    * Place your `google-services.json` in `android/app/`.
 
 4.  **Run the App**
     ```bash
@@ -96,18 +90,9 @@ A glimpse of the app's UI and key functionalities.
 
 ---
 
-## 🔮 Future Improvements
+## 👨‍💻 Developer
 
-* [ ] AI-based Recipe suggestions.
-* [ ] Expense Analytics Chart.
-* [ ] Dark Mode support.
-
----
-
-## 👨‍💻 Author
-
-**Gaurav**
-* Flutter Developer | Performance Enthusiast
-* Building apps that solve real-world problems.
+**Gaurav Magarde**
+* Focused on building scalable, offline-capable mobile applications.
 
 ---
