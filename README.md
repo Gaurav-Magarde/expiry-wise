@@ -21,10 +21,10 @@
 
 A visual tour of ExpiryWise features.
 
-|              **1. Smart Dashboard**               |               **2. AI & Scan Entry**               |              **3. Inventory Tracker**               |
-|:-------------------------------------------------:|:--------------------------------------------------:|:---------------------------------------------------:|
-| <img src="screenshots/1_dashboard.jpg" width="250"> | <img src="screenshots/2_add_item.jpg" width="250"> | <img src="screenshots/3_inventory.jpg" width="250"> |
-|           **Visual Analytics & Alerts**           |            **Voice Command & Barcode**             |               **Filter by Freshness**               |
+|              **1. Smart Dashboard**               |                 **2. AI & Scan Entry**                  |              **3. Inventory Tracker**               |
+|:-------------------------------------------------:|:-------------------------------------------------------:|:---------------------------------------------------:|
+| <img src="screenshots/1_dashboard.jpg" width="250"> | <img src="screenshots/2_voice_command.jpg" width="250"> | <img src="screenshots/3_inventory.jpg" width="250"> |
+|           **Visual Analytics & Alerts**           |               **Voice Command & Barcode**               |               **Filter by Freshness**               |
 
 |               **4. Expense Manager**               |                 **5. Quick Lists**                  |                **6. User Profile**                |
 |:--------------------------------------------------:|:---------------------------------------------------:|:-------------------------------------------------:|
